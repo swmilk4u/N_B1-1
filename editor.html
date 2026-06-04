@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM 모델 비교 에디터</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 1.6em;
+            color: #333;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .model-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid;
+        }
+        
+        .model-section.model-a {
+            border-left-color: #667eea;
+        }
+        
+        .model-section.model-b {
+            border-left-color: #f093fb;
+        }
+        
+        .model-section.model-c {
+            border-left-color: #34d399;
+        }
+        
+        .model-section h3 {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .score-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .score-item label {
+            display: block;
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .score-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .score-input-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .score-input-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        .score-input-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .score-value {
+            display: inline-block;
+            min-width: 30px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #667eea;
+        }
+
+        .score-value.score-five {
+            color: #065f46;
+        }
+
+        .score-value.score-five::after {
+            content: ' ✓';
+            color: #16a34a;
+            font-weight: 700;
+            margin-left: 6px;
+        }
+        
+        .text-input-group {
+            margin-bottom: 20px;
+        }
+        
+        .text-input-group label {
+            display: block;
+            font-size: 0.95em;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .text-input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95em;
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.3s;
+        }
+        
+        .text-input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .example-line {
+            background: #ffffff;
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #dde3f0;
+        }
+        
+        .example-line label {
+            display: block;
+            font-size: 0.95em;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .example-text {
+            color: #333;
+            line-height: 1.7;
+            font-size: 0.98em;
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .example-item {
+            background: #f4f7ff;
+            border: 1px solid #dde3f0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .example-item.example-five {
+            background: #ecfdf5;
+            border-color: #34d399;
+        }
+
+        .example-item.example-five label {
+            color: #065f46;
+        }
+        
+        .example-item label {
+            display: block;
+            font-size: 0.88em;
+            color: #555;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        
+        .example-item span {
+            display: block;
+            color: #333;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        .selection-group {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .selection-group h4 {
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .radio-item input[type="radio"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .radio-item label {
+            cursor: pointer;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        
+        button {
+            padding: 15px 40px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-reset {
+            background: #e0e0e0;
+            color: #333;
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        .btn-reset:hover {
+            background: #d0d0d0;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+            display: block;
+        }
+        
+        .message.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+            display: block;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-box .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .stat-box .value {
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .comparison-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e6ecf8;
+        }
+        
+        .comparison-table th {
+            text-align: left;
+            font-weight: 700;
+        }
+        
+        .comparison-table tbody tr:hover {
+            background: #f6f8ff;
+        }
+
+        .comparison-table td.score-five {
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        .comparison-table td.score-five::after {
+            content: ' ✓';
+            color: #16a34a;
+            font-weight: 700;
+            margin-left: 6px;
+        }
+        
+        .criteria-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.95em;
+        }
+        
+        .criteria-table th,
+        .criteria-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e6ecf8;
+            vertical-align: top;
+        }
+        
+        .criteria-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .criteria-table th {
+            text-align: left;
+            font-weight: 700;
+        }
+        
+        .criteria-table tbody tr:hover {
+            background: #f6f8ff;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 25px;
+        
+        
+        .chart-container {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .chart-title {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+        
+        .stat-summary {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: nowrap;
+        }
+        
+        .stat-summary .stat-box {
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 18px;
+            border-radius: 14px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-summary .model-a { background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%); }
+        .stat-summary .model-b { background: linear-gradient(135deg, #f093fb 0%, #f66dff 100%); }
+        .stat-summary .model-c { background: linear-gradient(135deg, #34d399 0%, #10b981 100%); }
+        
+        .stat-summary .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .stat-summary .value {
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .footer {
+            background: #f5f5f5;
+            padding: 20px 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .score-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 LLM 모델 비교 에디터</h1>
+            <p>점수 및 평가 내용을 수정하면 마크다운 파일이 자동으로 업데이트됩니다</p>
+        </div>
+        
+        <div class="content">
+            <div id="message" class="message"></div>
+            
+            <!-- 시각화 비교 -->
+            <div class="section">
+                <div class="section-title">📈 모델 비교 시각화</div>
+                <div class="stat-summary">
+                    <div class="stat-box model-a">
+                        <div class="label">GPT-5 종합 점수</div>
+                        <div class="value"><span id="gpt5-total-summary">27</span>/30</div>
+                    </div>
+                    <div class="stat-box model-b">
+                        <div class="label">Claude Sonnet 4.6 종합 점수</div>
+                        <div class="value"><span id="claude-total-summary">28</span>/30</div>
+                    </div>
+                    <div class="stat-box model-c">
+                        <div class="label">Gemini 2.5 Pro 종합 점수</div>
+                        <div class="value"><span id="gemini-total-summary">25</span>/30</div>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">레이더 차트 - 모델별 종합 비교</div>
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">대화로그(질문 리스트)</div>
+                        <div style="background: #ffffff; border-radius: 12px; padding: 20px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06); line-height: 1.7; font-size: 0.95em; color: #333; white-space: pre-wrap;">
+### 대화로그(질문 리스트)
+1. GitHub를 처음 사용하는 사용자에게 적합한 보고서 개요를 만들어줘. 주제는 "GitHub 입문자를 위한 첫 리포지토리 작성 가이드"이고, 톤은 친절하게 해줘. 필수로 GitHub 개념, 리포지토리 생성, 커밋/푸시, 브랜치, PR 기본을 포함해줘.
+2. 가능한 쉬운 말로 설명해줘.
+3. 각 항목마다 학습 목표도 넣어줘. 그리고 전문 용어 대신 쉬운 표현을 써줘. 예를 들면 "커밋"은 "변경 내용 저장"처럼.
+4. 목차에 "협업 사례"도 추가해줘. 그리고 "PR" 설명은 "코드 검토 요청"으로 쉽게 설명해줘.
+5. 톤은 더 친절하게, 그리고 확인 질문 없이 바로 결과를 보여줘.
+                        </div>
+                    </div>
+                </div>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>평가 항목</th>
+                            <th>GPT-5</th>
+                            <th>Claude Sonnet 4.6</th>
+                            <th>Gemini 2.5 Pro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="metric-label">정확성</td><td id="compare-gpt5-0">5</td><td id="compare-claude-0">4</td><td id="compare-gemini-0">5</td></tr>
+                        <tr><td class="metric-label">한국어 자연스러움</td><td id="compare-gpt5-1">4</td><td id="compare-claude-1">5</td><td id="compare-gemini-1">3</td></tr>
+                        <tr><td class="metric-label">형식 준수</td><td id="compare-gpt5-2">5</td><td id="compare-claude-2">5</td><td id="compare-gemini-2">4</td></tr>
+                        <tr><td class="metric-label">문맥 유지</td><td id="compare-gpt5-3">4</td><td id="compare-claude-3">5</td><td id="compare-gemini-3">4</td></tr>
+                        <tr><td class="metric-label">응답 속도</td><td id="compare-gpt5-4">5</td><td id="compare-claude-4">4</td><td id="compare-gemini-4">5</td></tr>
+                        <tr><td class="metric-label">비용 효율</td><td id="compare-gpt5-5">4</td><td id="compare-claude-5">5</td><td id="compare-gemini-5">4</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 종합 통계 -->
+            <div class="section">
+                <div class="section-title">📊 종합 점수</div>
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="label">GPT-5</div>
+                        <div class="value"><span id="gpt5-total">27</span>/30</div>
+                    </div>
+                    <div class="stat-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="label">Claude Sonnet 4.6</div>
+                        <div class="value"><span id="claude-total">28</span>/30</div>
+                    </div>
+                    <div class="stat-box" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="label">Gemini 2.5 Pro</div>
+                        <div class="value"><span id="gemini-total">25</span>/30</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- GPT-5 평가 -->
+            <div class="section">
+                <div class="section-title">🤖 모델 평가 수정</div>
+                
+                <div class="model-section model-a">
+                    <h3>모델 A: GPT-5</h3>
+                    <div class="example-grid">
+                        <div class="example-item"><label>정확성</label><span>필수 항목을 빠짐없이 포함한 보고서 개요를 준비했어요.</span></div>
+                        <div class="example-item"><label>한국어 자연스러움</label><span>처음 시작할 때 가장 헷갈리는 부분들을 중심으로, 따라 하기 쉬운 보고서 개요를 준비했어요.</span></div>
+                        <div class="example-item"><label>형식 준수</label><span>보고서 제목부터 PR 설명까지 체계적으로 정리한 구조를 보여줬어요.</span></div>
+                        <div class="example-item"><label>문맥 유지</label><span>GitHub 개념부터 리포지토리 생성, 커밋/푸시, 브랜치, PR로 자연스럽게 이어졌어요.</span></div>
+                        <div class="example-item"><label>응답 속도</label><span>질문에 빠르게 응답하며 바로 개요 구성과 목표를 제시했어요.</span></div>
+                        <div class="example-item"><label>비용 효율</label><span>짧고 명확한 문장으로 핵심을 전달해 처리 비용을 절감할 수 있어요.</span></div>
+                    </div>
+                    
+                    <div class="score-grid">
+                        <div class="score-item">
+                            <label>정확성</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="5" class="score-slider" data-model="gpt5" data-index="0">
+                                <span class="score-value" id="gpt5-score-0">5</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>한국어 자연스러움</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="4" class="score-slider" data-model="gpt5" data-index="1">
+                                <span class="score-value" id="gpt5-score-1">4</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>형식 준수</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="5" class="score-slider" data-model="gpt5" data-index="2">
+                                <span class="score-value" id="gpt5-score-2">5</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>문맥 유지</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="4" class="score-slider" data-model="gpt5" data-index="3">
+                                <span class="score-value" id="gpt5-score-3">4</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>응답 속도</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="5" class="score-slider" data-model="gpt5" data-index="4">
+                                <span class="score-value" id="gpt5-score-4">5</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>비용 효율</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="4" class="score-slider" data-model="gpt5" data-index="5">
+                                <span class="score-value" id="gpt5-score-5">4</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-input-group">
+                        <label>강점</label>
+                        <textarea id="gpt5-strengths" placeholder="이 모델의 강점을 입력하세요">정확성, 형식 준수, 응답 속도에서 최고 점수</textarea>
+                    </div>
+                    <div class="text-input-group">
+                        <label>약점</label>
+                        <textarea id="gpt5-weaknesses" placeholder="이 모델의 약점을 입력하세요">한국어 자연스러움에서 평균 수준</textarea>
+                    </div>
+                </div>
+                
+                <!-- Claude 평가 -->
+                <div class="model-section model-b">
+                    <h3>모델 B: Claude Sonnet 4.6</h3>
+                    <div class="example-grid">
+                        <div class="example-item"><label>정확성</label><span>보고서 개요와 전체 구조를 명확하게 제시했어요.</span></div>
+                        <div class="example-item"><label>한국어 자연스러움</label><span>한글 표현이 부드럽고 친절한 문체로 작성되었어요.</span></div>
+                        <div class="example-item"><label>형식 준수</label><span>목차와 예시 문구를 포함해 보기 좋은 형태로 정리했어요.</span></div>
+                        <div class="example-item"><label>문맥 유지</label><span>도입부터 PR 설명까지 흐름이 끊기지 않고 이어졌어요.</span></div>
+                        <div class="example-item"><label>응답 속도</label><span>즉시 개요와 목차를 보여주며 빠르게 응답했어요.</span></div>
+                        <div class="example-item"><label>비용 효율</label><span>짧고 직관적인 설명으로 불필요한 문장을 줄였어요.</span></div>
+                    </div>
+                    
+                    <div class="score-grid">
+                        <div class="score-item">
+                            <label>정확성</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="4" class="score-slider" data-model="claude" data-index="0">
+                                <span class="score-value" id="claude-score-0">4</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>한국어 자연스러움</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="5" class="score-slider" data-model="claude" data-index="1">
+                                <span class="score-value" id="claude-score-1">5</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>형식 준수</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="5" class="score-slider" data-model="claude" data-index="2">
+                                <span class="score-value" id="claude-score-2">5</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>문맥 유지</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="5" class="score-slider" data-model="claude" data-index="3">
+                                <span class="score-value" id="claude-score-3">5</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>응답 속도</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="4" class="score-slider" data-model="claude" data-index="4">
+                                <span class="score-value" id="claude-score-4">4</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>비용 효율</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="5" class="score-slider" data-model="claude" data-index="5">
+                                <span class="score-value" id="claude-score-5">5</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-input-group">
+                        <label>강점</label>
+                        <textarea id="claude-strengths" placeholder="이 모델의 강점을 입력하세요">한국어 자연스러움, 문맥 유지, 비용 효율에서 우수</textarea>
+                    </div>
+                    <div class="text-input-group">
+                        <label>약점</label>
+                        <textarea id="claude-weaknesses" placeholder="이 모델의 약점을 입력하세요">정확성에서 5점 미만</textarea>
+                    </div>
+                </div>
+                
+                <!-- Gemini 평가 -->
+                <div class="model-section model-c">
+                    <h3>모델 C: Gemini 2.5 Pro</h3>
+                    <div class="example-grid">
+                        <div class="example-item"><label>정확성</label><span>GitHub를 코드용 클라우드로 비유하며 핵심 개념을 정확하게 전달했어요.</span></div>
+                        <div class="example-item"><label>한국어 자연스러움</label><span>쉬운 말과 친근한 비유로 처음 사용자 눈높이에 맞췄어요.</span></div>
+                        <div class="example-item"><label>형식 준수</label><span>보고서 제목, 부제, 단계별 안내를 체계적으로 구성했어요.</span></div>
+                        <div class="example-item"><label>문맥 유지</label><span>각 항목이 자연스럽게 이어져 전체 흐름이 잘 유지됐어요.</span></div>
+                        <div class="example-item"><label>응답 속도</label><span>질문에 바로 답을 제시하며 빠른 응답성을 보였어요.</span></div>
+                        <div class="example-item"><label>비용 효율</label><span>적절한 길이로 핵심을 담아 부담 없이 읽을 수 있어요.</span></div>
+                    </div>
+                    
+                    <div class="score-grid">
+                        <div class="score-item">
+                            <label>정확성</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="5" class="score-slider" data-model="gemini" data-index="0">
+                                <span class="score-value" id="gemini-score-0">5</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>한국어 자연스러움</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="3" class="score-slider" data-model="gemini" data-index="1">
+                                <span class="score-value" id="gemini-score-1">3</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>형식 준수</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="4" class="score-slider" data-model="gemini" data-index="2">
+                                <span class="score-value" id="gemini-score-2">4</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>문맥 유지</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="4" class="score-slider" data-model="gemini" data-index="3">
+                                <span class="score-value" id="gemini-score-3">4</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>응답 속도</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="5" class="score-slider" data-model="gemini" data-index="4">
+                                <span class="score-value" id="gemini-score-4">5</span>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <label>비용 효율</label>
+                            <div class="score-input-group">
+                                <input type="range" min="1" max="5" value="4" class="score-slider" data-model="gemini" data-index="5">
+                                <span class="score-value" id="gemini-score-5">4</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-input-group">
+                        <label>강점</label>
+                        <textarea id="gemini-strengths" placeholder="이 모델의 강점을 입력하세요">정확성과 응답 속도에서 최고 수준</textarea>
+                    </div>
+                    <div class="text-input-group">
+                        <label>약점</label>
+                        <textarea id="gemini-weaknesses" placeholder="이 모델의 약점을 입력하세요">한국어 자연스러움에서 가장 낮은 점수</textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 최종 선택 -->
+            <div class="section">
+                <div class="section-title">🏆 최종 선정</div>
+                
+                <div class="selection-group">
+                    <h4>최고 성능 모델 선택</h4>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="select-gpt5" name="selection" value="gpt5" />
+                            <label for="select-gpt5">GPT-5</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="select-claude" name="selection" value="claude" checked />
+                            <label for="select-claude">Claude Sonnet 4.6</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="select-gemini" name="selection" value="gemini" />
+                            <label for="select-gemini">Gemini 2.5 Pro</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-input-group">
+                    <label>선정 이유</label>
+                    <textarea id="selection-reason" placeholder="이 모델을 선택한 이유를 입력하세요">전반적으로 가장 균형잡힌 성능을 보이며, 특히 한국어 처리와 문맥 이해 능력이 우수함</textarea>
+                </div>
+            </div>
+            
+            <!-- 저장/리셋 버튼 -->
+            <div class="button-group">
+                <button class="btn-save" onclick="saveData()">💾 저장 및 마크다운 업데이트</button>
+                <button class="btn-reset" onclick="resetData()">🔄 초기값 복원</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>✨ 수정한 내용은 자동으로 01, 02, 03 마크다운 파일에 반영됩니다</p>
+            <p>💡 모든 변경사항은 로컬 서버의 API를 통해 파일 시스템에 저장됩니다</p>
+        </div>
+    </div>
+    
+    <script>
+        // 점수 슬라이더 변화 감지
+        document.querySelectorAll('.score-slider').forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const model = e.target.dataset.model;
+                const index = e.target.dataset.index;
+                const value = e.target.value;
+                
+                document.getElementById(`${model}-score-${index}`).textContent = value;
+                updateTotals();
+            });
+        });
+        
+        // 총점 업데이트
+        const modelClassMap = {
+            gpt5: 'model-a',
+            claude: 'model-b',
+            gemini: 'model-c'
+        };
+
+        function updateTotals() {
+            const models = ['gpt5', 'claude', 'gemini'];
+            models.forEach(model => {
+                let total = 0;
+                const section = document.querySelector(`.model-section.${modelClassMap[model]}`);
+                const exampleItems = section ? section.querySelectorAll('.example-item') : [];
+
+                for (let i = 0; i < 6; i++) {
+                    const score = parseInt(document.getElementById(`${model}-score-${i}`).textContent);
+                    total += score;
+                    const compareCell = document.getElementById(`compare-${model}-${i}`);
+                    const scoreValue = document.getElementById(`${model}-score-${i}`);
+                    if (compareCell) {
+                        compareCell.textContent = score;
+                        compareCell.classList.toggle('score-five', score === 5);
+                    }
+                    if (scoreValue) {
+                        scoreValue.classList.toggle('score-five', score === 5);
+                    }
+                    if (exampleItems[i]) {
+                        exampleItems[i].classList.toggle('example-five', score === 5);
+                    }
+                }
+                document.getElementById(`${model}-total`).textContent = total;
+                document.getElementById(`${model}-total-summary`).textContent = total;
+            });
+            updateCharts();
+        }
+        
+        let radarChart;
+        const chartLabels = ['정확성', '한국어 자연스러움', '형식 준수', '문맥 유지', '응답 속도', '비용 효율'];
+        const chartColors = {
+            gpt5: 'rgba(102, 126, 234, 0.7)',
+            claude: 'rgba(240, 147, 251, 0.7)',
+            gemini: 'rgba(52, 211, 153, 0.7)'
+        };
+        
+        function initCharts() {
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            
+            const datasets = ['gpt5', 'claude', 'gemini'].map(model => ({
+                label: model === 'gpt5' ? 'GPT-5' : model === 'claude' ? 'Claude Sonnet 4.6' : 'Gemini 2.5 Pro',
+                data: getModelScores(model),
+                fill: true,
+                backgroundColor: chartColors[model].replace('0.7', '0.2'),
+                borderColor: chartColors[model],
+                pointBackgroundColor: chartColors[model],
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: chartColors[model]
+            }));
+            
+            radarChart = new Chart(radarCtx, {
+                type: 'radar',
+                data: { labels: chartLabels, datasets },
+                options: {
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            suggestedMax: 5,
+                            ticks: { stepSize: 1 }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+        }
+        
+        function getModelScores(model) {
+            return Array.from({ length: 6 }, (_, i) => parseInt(document.getElementById(`${model}-score-${i}`).textContent));
+        }
+        
+        function updateCharts() {
+            if (!radarChart) return;
+            ['gpt5', 'claude', 'gemini'].forEach((model, index) => {
+                const scores = getModelScores(model);
+                radarChart.data.datasets[index].data = scores;
+            });
+            radarChart.update();
+        }
+        
+        function initComparison() {
+            initCharts();
+            updateTotals();
+        }
+        
+        // 데이터 저장
+        async function saveData() {
+            const scores = {
+                gpt5: [],
+                claude: [],
+                gemini: []
+            };
+            
+            ['gpt5', 'claude', 'gemini'].forEach(model => {
+                for (let i = 0; i < 6; i++) {
+                    scores[model].push(parseInt(document.getElementById(`${model}-score-${i}`).textContent));
+                }
+            });
+            
+            const models = {
+                gpt5: {
+                    strengths: document.getElementById('gpt5-strengths').value,
+                    weaknesses: document.getElementById('gpt5-weaknesses').value
+                },
+                claude: {
+                    strengths: document.getElementById('claude-strengths').value,
+                    weaknesses: document.getElementById('claude-weaknesses').value
+                },
+                gemini: {
+                    strengths: document.getElementById('gemini-strengths').value,
+                    weaknesses: document.getElementById('gemini-weaknesses').value
+                }
+            };
+            
+            const selection = {
+                model: document.querySelector('input[name="selection"]:checked').value,
+                reason: document.getElementById('selection-reason').value
+            };
+            
+            const modelNames = {
+                gpt5: 'GPT-5',
+                claude: 'Claude Sonnet 4.6',
+                gemini: 'Gemini 2.5 Pro'
+            };
+            
+            selection.modelName = modelNames[selection.model];
+            
+            try {
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ scores, models, selection })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('✅ 저장 완료! 마크다운 파일이 업데이트되었습니다.', 'success');
+                    console.log('총점:', result.scores);
+                } else {
+                    showMessage('❌ 저장 실패: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ 오류 발생: ' + error.message, 'error');
+            }
+        }
+        
+        // 메시지 표시
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageEl.className = 'message';
+                }, 3000);
+            }
+        }
+        
+        // 초기값 복원
+        function resetData() {
+            if (confirm('초기값으로 복원하시겠습니까?')) {
+                location.reload();
+            }
+        }
+        
+        // 초기 로드
+        window.addEventListener('load', initComparison);
+    </script>
+</body>
+</html>
