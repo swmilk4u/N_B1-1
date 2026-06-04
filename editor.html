@@ -1048,9 +1048,54 @@
                 location.reload();
             }
         }
-        
+
+        // API 데이터로 슬라이더·텍스트 초기화
+        async function loadFromApi() {
+            try {
+                const res = await fetch('/api/data');
+                if (!res.ok) throw new Error('API 오류');
+                const data = await res.json();
+
+                const modelMap = { gpt5: 'gpt5', claude: 'claude', gemini: 'gemini' };
+                Object.entries(modelMap).forEach(([key]) => {
+                    const scores = data.scores[key];
+                    if (!scores) return;
+                    for (let i = 0; i < 6; i++) {
+                        const slider = document.querySelector(`.score-slider[data-model="${key}"][data-index="${i}"]`);
+                        const display = document.getElementById(`${key}-score-${i}`);
+                        if (slider && display) {
+                            slider.value = scores[i];
+                            display.textContent = scores[i];
+                        }
+                    }
+                    const modelInfo = data.models[key];
+                    if (modelInfo) {
+                        const strEl = document.getElementById(`${key}-strengths`);
+                        const wkEl  = document.getElementById(`${key}-weaknesses`);
+                        if (strEl && modelInfo.strengths) strEl.value = modelInfo.strengths;
+                        if (wkEl  && modelInfo.weaknesses) wkEl.value  = modelInfo.weaknesses;
+                    }
+                });
+
+                if (data.selection) {
+                    const radio = document.querySelector(`input[name="selection"][value="${data.selection.model}"]`);
+                    if (radio) radio.checked = true;
+                    const reason = document.getElementById('selection-reason');
+                    if (reason && data.selection.reason) reason.value = data.selection.reason;
+                }
+
+                updateTotals();
+            } catch (e) {
+                console.warn('API 로드 실패, 기본값 유지:', e);
+                initComparison();
+            }
+        }
+
         // 초기 로드
-        window.addEventListener('load', initComparison);
+        window.addEventListener('load', () => {
+            initComparison();
+            loadFromApi();
+        });
     </script>
 </body>
 </html>

@@ -507,130 +507,219 @@
     </div>
     
     <script>
-        // 레이더 차트 데이터
-        const radarCtx = document.getElementById('radarChart').getContext('2d');
-        const radarChart = new Chart(radarCtx, {
-            type: 'radar',
-            data: {
-                labels: ['정확성', '한국어 자연스러움', '형식 준수', '문맥 유지', '응답 속도', '비용 효율'],
-                datasets: [
-                    {
-                        label: 'GPT-5',
-                        data: [5, 4, 5, 4, 5, 4],
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        pointBackgroundColor: '#667eea',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#667eea',
-                        borderWidth: 2,
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Claude Sonnet 4.6',
-                        data: [4, 5, 5, 5, 4, 5],
-                        borderColor: '#f093fb',
-                        backgroundColor: 'rgba(240, 147, 251, 0.1)',
-                        pointBackgroundColor: '#f093fb',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#f093fb',
-                        borderWidth: 2,
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Gemini 2.5 Pro',
-                        data: [5, 3, 4, 4, 5, 4],
-                        borderColor: '#4facfe',
-                        backgroundColor: 'rgba(79, 172, 254, 0.1)',
-                        pointBackgroundColor: '#4facfe',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#4facfe',
-                        borderWidth: 2,
-                        tension: 0.4
-                    }
-                ]
+        const metricLabels = ['정확성', '한국어 자연스러움', '형식 준수', '문맥 유지', '응답 속도', '비용 효율'];
+        const modelKeys = ['gpt5', 'claude', 'gemini'];
+        const modelNames = {
+            gpt5: 'GPT-5',
+            claude: 'Claude Sonnet 4.6',
+            gemini: 'Gemini 2.5 Pro'
+        };
+
+        const fallbackData = {
+            scores: {
+                gpt5: [5, 4, 5, 4, 5, 4],
+                claude: [4, 5, 5, 5, 4, 5],
+                gemini: [5, 3, 4, 4, 5, 4]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        max: 5,
-                        ticks: {
-                            stepSize: 1,
-                            color: '#999'
+            models: {
+                gpt5: { strengths: '정확성, 형식 준수, 응답 속도에서 최고 점수', weaknesses: '한국어 자연스러움에서 평균 수준' },
+                claude: { strengths: '한국어 자연스러움, 문맥 유지, 비용 효율에서 우수', weaknesses: '정확성에서 5점 미만' },
+                gemini: { strengths: '정확성과 응답 속도에서 최고 수준', weaknesses: '한국어 자연스러움에서 가장 낮은 점수' }
+            },
+            selection: { model: 'claude', modelName: 'Claude Sonnet 4.6' }
+        };
+
+        function total(values) {
+            return values.reduce((acc, cur) => acc + cur, 0);
+        }
+
+        function setScoreBadge(el, value) {
+            el.textContent = String(value);
+            el.className = `score score-${value}`;
+        }
+
+        function buildCharts(data) {
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            const barCtx = document.getElementById('barChart').getContext('2d');
+
+            const radarChart = new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: metricLabels,
+                    datasets: [
+                        {
+                            label: modelNames.gpt5,
+                            data: data.scores.gpt5,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            pointBackgroundColor: '#667eea',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#667eea',
+                            borderWidth: 2,
+                            tension: 0.4
                         },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
+                        {
+                            label: modelNames.claude,
+                            data: data.scores.claude,
+                            borderColor: '#f093fb',
+                            backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                            pointBackgroundColor: '#f093fb',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#f093fb',
+                            borderWidth: 2,
+                            tension: 0.4
                         },
-                        angleLines: {
-                            color: 'rgba(0, 0, 0, 0.1)'
+                        {
+                            label: modelNames.gemini,
+                            data: data.scores.gemini,
+                            borderColor: '#4facfe',
+                            backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                            pointBackgroundColor: '#4facfe',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#4facfe',
+                            borderWidth: 2,
+                            tension: 0.4
                         }
-                    }
+                    ]
                 },
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            font: { size: 12 },
-                            usePointStyle: true
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 5,
+                            ticks: { stepSize: 1, color: '#999' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20, font: { size: 12 }, usePointStyle: true }
                         }
                     }
                 }
-            }
-        });
-        
-        // 막대 그래프
-        const barCtx = document.getElementById('barChart').getContext('2d');
-        const barChart = new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: ['정확성', '한국어', '형식 준수', '문맥 유지', '응답 속도', '비용 효율'],
-                datasets: [
-                    {
-                        label: 'GPT-5',
-                        data: [5, 4, 5, 4, 5, 4],
-                        backgroundColor: '#667eea'
-                    },
-                    {
-                        label: 'Claude Sonnet 4.6',
-                        data: [4, 5, 5, 5, 4, 5],
-                        backgroundColor: '#f093fb'
-                    },
-                    {
-                        label: 'Gemini 2.5 Pro',
-                        data: [5, 3, 4, 4, 5, 4],
-                        backgroundColor: '#4facfe'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 5,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
+            });
+
+            const barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['정확성', '한국어', '형식 준수', '문맥 유지', '응답 속도', '비용 효율'],
+                    datasets: [
+                        { label: modelNames.gpt5, data: data.scores.gpt5, backgroundColor: '#667eea' },
+                        { label: modelNames.claude, data: data.scores.claude, backgroundColor: '#f093fb' },
+                        { label: modelNames.gemini, data: data.scores.gemini, backgroundColor: '#4facfe' }
+                    ]
                 },
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            font: { size: 12 }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 15, font: { size: 12 } }
                         }
                     }
                 }
+            });
+
+            return { radarChart, barChart };
+        }
+
+        function renderScoreTable(data) {
+            const scoreTable = document.querySelectorAll('.comparison-table')[0];
+            if (!scoreTable) return;
+
+            const rows = scoreTable.querySelectorAll('tbody tr');
+            rows.forEach((row, idx) => {
+                const values = [data.scores.gpt5[idx], data.scores.claude[idx], data.scores.gemini[idx]];
+                const badges = row.querySelectorAll('span.score');
+                badges.forEach((badge, i) => setScoreBadge(badge, values[i]));
+            });
+        }
+
+        function renderModelCards(data) {
+            const cards = document.querySelectorAll('.model-card');
+            cards.forEach((card, idx) => {
+                const key = modelKeys[idx];
+                const modelData = data.models[key] || {};
+                const modelTotal = total(data.scores[key]);
+                const topTotal = Math.max(...modelKeys.map((k) => total(data.scores[k])));
+
+                const totalEl = card.querySelector('strong');
+                if (totalEl) {
+                    totalEl.textContent = modelTotal === topTotal
+                        ? `평점 합계: ${modelTotal}/30점 ⭐ 최고 성능`
+                        : `평점 합계: ${modelTotal}/30점`;
+                }
+
+                const summaryEl = card.querySelector('p');
+                if (summaryEl) {
+                    summaryEl.innerHTML = `<strong>강점:</strong> ${modelData.strengths || '-'}<br><strong>약점:</strong> ${modelData.weaknesses || '-'}`;
+                }
+            });
+        }
+
+        function renderSummary(data) {
+            const totals = {
+                gpt5: total(data.scores.gpt5),
+                claude: total(data.scores.claude),
+                gemini: total(data.scores.gemini)
+            };
+
+            const bestModel = data.selection && data.selection.model ? data.selection.model : Object.keys(totals).reduce((a, b) => totals[a] >= totals[b] ? a : b);
+            const bestAccuracy = Math.max(data.scores.gpt5[0], data.scores.claude[0], data.scores.gemini[0]);
+            const accuracyLeaders = modelKeys.filter((k) => data.scores[k][0] === bestAccuracy).map((k) => modelNames[k]);
+            const bestKorean = Math.max(data.scores.gpt5[1], data.scores.claude[1], data.scores.gemini[1]);
+            const koreanLeader = modelKeys.find((k) => data.scores[k][1] === bestKorean) || 'claude';
+
+            const boxes = document.querySelectorAll('.summary-grid .summary-box');
+            if (boxes.length >= 3) {
+                boxes[0].querySelector('.value').innerHTML = modelNames[bestModel].replace(' ', '<br>');
+                boxes[0].querySelector('p').textContent = `${totals[bestModel]}/30점`;
+
+                boxes[1].querySelector('.value').innerHTML = accuracyLeaders.join('<br>& ');
+                boxes[1].querySelector('p').textContent = `최고 ${bestAccuracy}점`;
+
+                boxes[2].querySelector('.value').innerHTML = modelNames[koreanLeader].replace(' ', '<br>');
+                boxes[2].querySelector('p').textContent = `${bestKorean}점 / 5점`;
             }
-        });
+
+            const recommendationItems = document.querySelectorAll('ul[style*="list-style: none"] li');
+            if (recommendationItems.length >= 5) {
+                recommendationItems[0].innerHTML = `✅ <strong>한국어 콘텐츠 생성:</strong> ${modelNames[koreanLeader]} (최우수)`;
+                recommendationItems[4].innerHTML = `✅ <strong>전반적 추천:</strong> <strong style="color: #667eea;">${modelNames[bestModel]}</strong> (균형 잡힌 성능)`;
+            }
+        }
+
+        function renderAll(data) {
+            renderScoreTable(data);
+            renderModelCards(data);
+            renderSummary(data);
+            buildCharts(data);
+        }
+
+        async function syncFromMarkdown() {
+            try {
+                const response = await fetch('/api/data');
+                if (!response.ok) throw new Error('API 응답 오류');
+                const data = await response.json();
+                renderAll(data);
+            } catch (error) {
+                console.warn('API 동기화 실패, 기본 데이터 사용:', error);
+                renderAll(fallbackData);
+            }
+        }
+
+        window.addEventListener('load', syncFromMarkdown);
     </script>
 </body>
 </html>
