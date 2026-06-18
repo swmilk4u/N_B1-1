@@ -243,5 +243,6 @@ ${scoreTableRows.join('\n')}`;
 // 서버 시작
 app.listen(PORT, () => {
     console.log(`✨ 서버가 http://localhost:4001에서 실행 중입니다`);
-    console.log(`📊 에디터 접속: http://localhost:4001/editor.html`);
+    console.log(`📊 비교 분석 & 에디터: http://localhost:4001/모델_비교_시각화.html`);
+    console.log(`↗  editor.html 접속 시 자동으로 통합 페이지로 리다이렉트됩니다`);
 });
