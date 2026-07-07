@@ -561,15 +561,26 @@
                 <ul>
                     <li><strong>특징</strong>: 프롬프트 구성이 단순하고 토큰 소모가 적어 응답 속도 면에서 매우 효율적입니다.</li>
                     <li><strong>한계</strong>: 모델의 생성 자유도가 높아 매 실행마다 출력 스키마(형식)의 준수율이 불완전하며, 답변의 친밀도나 톤앤매너를 일관성 있게 강제하기 어렵습니다.</li>
-                    <li><strong>실제 로그 예시 (02_source 연동)</strong>: 본 프로젝트 테스트의 <strong>1턴(초기 생성 요청)</strong>이 대표적인 Zero-shot 수행 사례입니다. 별도의 예시 제공 없이 가이드를 생성하도록 지시하여 모델별 출력 포맷의 편차가 가장 크게 나타난 지점입니다.
-                        <ul>
-                            <li><a href="02_source/%EB%AA%A8%EB%8D%B8%20A_GPT-5_%EB%8C%80%ED%99%94_%EB%A1%9C%EA%B7%B8.txt#L7" target="_blank" style="color: #3b82f6; text-decoration: underline;">[GPT-5 대화 로그 1턴 바로가기]</a></li>
-                            <li><a href="02_source/%EB%AA%A8%EB%8D%B8%20B_Claude_Sonnet4.6_%EB%8C%80%ED%99%94_%EB%A1%9C%EA%B7%B8.txt#L7" target="_blank" style="color: #3b82f6; text-decoration: underline;">[Claude 대화 로그 1턴 바로가기]</a></li>
-                            <li><a href="02_source/%EB%AA%A8%EB%8D%B8%20C_Gemini_2.5_Pro_%EB%8C%80%ED%99%94_%EB%A1%9C%EA%B7%B8.txt#L7" target="_blank" style="color: #3b82f6; text-decoration: underline;">[Gemini 대화 로그 1턴 바로가기]</a></li>
-                        </ul>
-                    </li>
                     <li><strong>보완</strong>: 이러한 출력 편차를 제어하기 위해 2.7절과 같이 정교하게 정의된 입출력 패턴을 미리 이식하는 <strong>Few-shot Prompting</strong>을 적용하여 시스템의 강건성을 보강합니다.</li>
                 </ul>
+
+                <h4>Zero-shot 실제 사례 (대화 로그 1턴 발췌)</h4>
+                <div class="code-title">Zero-shot Input & Output (Claude 4.6 1턴)</div>
+                <div class="log-box">**사용자 입력:**
+GitHub를 처음 사용하는 사용자에게 적합한 보고서 개요를 만들어줘. 주제는 "GitHub 입문자를 위한 첫 리포지토리 작성 가이드"이고, 톤은 친절하게 해줘. 필수로 GitHub 개념, 리포지토리 생성, 커밋/푸시, 브랜치, PR 기본을 포함해줘.
+
+**AI 최종 출력:**
+📘 보고서 개요: GitHub 입문자를 위한 첫 리포지토리 작성 가이드
+📋 전체 구조 한눈에 보기
+1. 들어가며 (가이드의 대상 독자 및 기대 효과)
+2. GitHub란 무엇인가? (Git vs GitHub 차이, 핵심 용어)
+3. 첫 리포지토리 만들기 (저장소 생성 단계별 안내)
+4. 커밋과 푸시 이해하기 (변경 내용 저장 및 올리기)
+5. 브랜치 활용하기 (독립적인 작업 공간의 개념)
+6. Pull Request(PR) 기초 (코드 검토 요청 방법)
+7. 마치며 (입문자 격려 메시지)
+
+* 원본 출처: <a href="02_source/%EB%AA%A8%EB%8D%B8%20B_Claude_Sonnet4.6_%EB%8C%80%ED%99%94_%EB%A1%9C%EA%B7%B8.txt#L7" target="_blank" style="color: #3b82f6; text-decoration: underline;">[Claude 대화 로그 1턴 바로가기]</a></div>
                 
                 <h3>2.7 Few-shot 예시 (4개)</h3>
                 <p><strong>Few-shot Prompting</strong>: 입출력 예시 쌍을 시스템 프롬프트에 미리 포함하여 모델에게 원하는 응답 양식과 페르소나 행동을 직관적으로 학습시키는 기법입니다.</p>
