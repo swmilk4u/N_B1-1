@@ -556,32 +556,14 @@
 - 모르는 내용은 "확인이 필요합니다"라고 솔직하게 답하고 확인 방법을 제안한다
 - 질문의 전제가 불명확할 경우 확인 질문을 먼저 한다</div>
 
-                <h4>2.6.2 Zero-shot 지시 및 대화 사례</h4>
-                <p><strong>Zero-shot Prompting</strong>: 어떠한 입출력 예시(Example) 없이 지시(Instruction)문과 시스템 규칙만으로 AI에게 즉각적인 응답을 유도하는 기법입니다.</p>
+                <h4>2.6.2 Zero-shot 기법의 개념과 특징</h4>
+                <p><strong>Zero-shot Prompting</strong>은 어떠한 입출력 예시(Shot) 쌍을 미리 제공하지 않고, 지시(Instruction)문과 시스템 규칙만으로 모델에게 즉각적인 응답을 얻어내는 기법입니다.</p>
+                <ul>
+                    <li><strong>특징</strong>: 프롬프트 구성이 단순하고 토큰 소모가 적어 응답 속도 면에서 매우 효율적입니다.</li>
+                    <li><strong>한계</strong>: 모델의 생성 자유도가 높아 매 실행마다 출력 스키마(형식)의 준수율이 불완전하며, 답변의 친밀도나 톤앤매너를 일관성 있게 강제하기 어렵다는 단점이 있습니다.</li>
+                    <li><strong>보완</strong>: 이러한 출력 편차를 제어하기 위해 2.7절과 같이 정교하게 정의된 입출력 패턴을 미리 이식하는 <strong>Few-shot Prompting</strong>을 적용하여 시스템의 강건성을 보강합니다.</li>
+                </ul>
                 
-                <h4>Zero-shot 사례: 모호한 입력 시 AI의 역질문(확인 질문) 유도</h4>
-                <div class="code-title">Zero-shot Input & Output</div>
-                <div class="log-box">**사용자 입력:**
-GitHub 가이드 만들어줘.
-
-**AI 최종 출력:**
-보고서를 잘 만들기 위해 몇 가지 확인이 필요합니다!
-1. 대상 독자가 누구인가요?
-   - 예: 완전 초보자 / 다른 버전 관리 도구 경험자 / 팀 관리자
-2. 어떤 내용을 중심으로 다루고 싶으신가요?
-   - 예: 기초 개념 위주 / 실습 위주 / 협업 워크플로우 위주
-3. 원하시는 톤이 있으신가요?
-   - 예: 친절하고 쉬운 말 / 간결하고 실무적 / 격식체
-
-위 정보를 알려주시면, 딱 맞는 보고서 개요를 만들어 드릴게요!</div>
-                <div class="callout callout-info" style="margin-top: -15px; margin-bottom: 25px;">
-                    <div class="callout-icon"><i class="fa-solid fa-circle-info"></i></div>
-                    <div class="callout-content">
-                        <h4>💡 Zero-shot 작동 해설</h4>
-                        <p>이 사례는 사용자로부터 어떠한 구체적 정보나 예시(Shot)가 주어지지 않은 채 모호한 명령만 유입되었을 때, 프롬프트 v2 시스템 안전 규칙(안전 규칙 및 부족하면 질문 원칙)에 근거하여 AI가 자의적으로 오답을 지어내지 않고 자발적으로 확인 질문을 던지도록 제어된 <strong>Zero-shot 처리 예시</strong>입니다.</p>
-                    </div>
-                </div>
-
                 <h3>2.7 Few-shot 예시 (4개)</h3>
                 <p><strong>Few-shot Prompting</strong>: 입출력 예시 쌍을 시스템 프롬프트에 미리 포함하여 모델에게 원하는 응답 양식과 페르소나 행동을 직관적으로 학습시키는 기법입니다.</p>
                 
