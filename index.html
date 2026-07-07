@@ -2,10 +2,908 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=03_etc/모델_비교_시각화.html">
-    <title>GitHub Pages 리다이렉트</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM 모델 비교·선정 및 프롬프트 시스템 설계 최종 보고서</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray-dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #f8fafc;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            color: var(--dark);
+            background-color: #f1f5f9;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header & Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 50%, #06b6d4 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 20px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto 35px auto;
+        }
+
+        .btn-dashboard {
+            display: inline-flex;
+            align-items: center;
+            background-color: white;
+            color: var(--primary-dark);
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            transition: var(--transition);
+            gap: 10px;
+        }
+
+        .btn-dashboard:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            background-color: #f8fafc;
+        }
+
+        /* Sticky Navigation Bar */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 15px 20px;
+        }
+
+        .nav-link {
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-dark);
+            background-color: var(--primary-light);
+        }
+
+        /* Main Grid Layout */
+        .main-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        .section-card {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .section-card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 12px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        /* Data Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0 30px 0;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: var(--gray-light);
+            color: var(--dark);
+            font-weight: 600;
+            text-align: left;
+            padding: 14px 18px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            color: #334155;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        /* Custom Badges in Tables */
+        .badge-model {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .badge-gpt { background-color: #ffe4e6; color: #be123c; }
+        .badge-claude { background-color: #dbeafe; color: #1d4ed8; }
+        .badge-gemini { background-color: #e0f2fe; color: #0369a1; }
+        
+        .badge-score {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .badge-score-5 { background-color: #d1fae5; color: #065f46; }
+        .badge-score-4 { background-color: #ecfdf5; color: #047857; }
+        .badge-score-3 { background-color: #fef3c7; color: #92400e; }
+
+        /* Callout Boxes (Alerts) */
+        .callout {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            border-left: 5px solid transparent;
+        }
+
+        .callout-info {
+            background-color: #eff6ff;
+            border-left-color: #3b82f6;
+            color: #1e3a8a;
+        }
+        .callout-info i { color: #3b82f6; }
+
+        .callout-warning {
+            background-color: #fffbeb;
+            border-left-color: #f59e0b;
+            color: #78350f;
+        }
+        .callout-warning i { color: #f59e0b; }
+
+        .callout-success {
+            background-color: #ecfdf5;
+            border-left-color: #10b981;
+            color: #065f46;
+        }
+        .callout-success i { color: #10b981; }
+
+        .callout-icon {
+            font-size: 1.25rem;
+            margin-top: 2px;
+        }
+
+        .callout-content h4 {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .callout-content p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Nested content styling */
+        .content-sub {
+            margin-left: 20px;
+            margin-top: 15px;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin: 25px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 25px;
+            color: #334155;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Image Display Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .image-card {
+            background-color: var(--gray-light);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .image-info {
+            padding: 15px;
+        }
+
+        .image-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--dark);
+        }
+
+        .image-info p {
+            font-size: 0.85rem;
+            color: var(--gray);
+            line-height: 1.4;
+        }
+
+        /* Tab Layout for Logs */
+        .tabs {
+            margin: 25px 0;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-dark);
+            background-color: var(--gray-light);
+        }
+
+        .tab-btn.active {
+            color: white;
+            background-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 25px 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .log-box {
+            background-color: var(--gray-dark);
+            color: #e2e8f0;
+            padding: 25px;
+            border-radius: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid #334155;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .log-turn-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .log-role {
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .role-user { background-color: #3b82f6; color: white; }
+        .role-ai { background-color: #10b981; color: white; }
+
+        .log-link {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+
+        .log-link:hover {
+            color: var(--primary-light);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: #94a3b8;
+            padding: 50px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            margin-top: 60px;
+            border-top: 1px solid #1e293b;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        footer a:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .section-card {
+                padding: 20px;
+            }
+            .nav-container {
+                gap: 15px;
+                padding: 10px;
+                flex-wrap: wrap;
+            }
+            .nav-link {
+                font-size: 0.85rem;
+                padding: 4px 8px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <p>통합 모델 비교 시각화 대시보드로 이동 중입니다. 자동으로 이동하지 않으면 <a href="03_etc/모델_비교_시각화.html">여기</a>를 클릭하세요.</p>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-container">
+            <span class="badge"><i class="fa-solid fa-graduation-cap"></i> 코디세이 AI 네이티브 과정</span>
+            <h1>LLM 모델 비교·선정 및<br>프롬프트 시스템 설계 최종 보고서</h1>
+            <p>비개발자 교육용 "GitHub 첫 걸음 가이드북 개요" 작성을 최적으로 수행하는 LLM을 테스트하고, 형식 통제 및 환각 억제를 위한 에이전트 프롬프트 시스템을 설계 및 검증한 최종 보고서입니다.</p>
+            <a href="03_etc/모델_비교_시각화.html" class="btn-dashboard">
+                <i class="fa-solid fa-chart-pie"></i> 실시간 비교분석 대시보드 열기
+            </a>
+        </div>
+    </div>
+
+    <!-- Sticky Navigation Bar -->
+    <div class="navbar">
+        <div class="nav-container">
+            <a href="#part1" class="nav-link"><i class="fa-solid fa-scale-balanced"></i> Part 1. 모델 비교 및 선정</a>
+            <a href="#part2" class="nav-link"><i class="fa-solid fa-gears"></i> Part 2. 프롬프트 시스템 설계</a>
+            <a href="#part3" class="nav-link"><i class="fa-solid fa-receipt"></i> Part 3. 시나리오 실행 및 검증</a>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+
+        <!-- Part 1: Model Comparison -->
+        <div id="part1" class="section-card">
+            <h2 class="section-title"><i class="fa-solid fa-scale-balanced"></i> Part 1. LLM 모델 비교 및 선정 보고서</h2>
+            
+            <p>동일한 "회의록 및 설명 개요 요약" 과업에 대해 3종의 최신 LLM(GPT-5, Claude 4.6, Gemini 2.5 Pro)을 웹(Naito) 인터페이스 환경에서 6개 핵심 평가 축을 기준으로 5점 척도 정량 평가를 실시하였습니다.</p>
+            
+            <h3>📊 모델 평가 종합 비교표</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>평가 기준</th>
+                            <th>설명</th>
+                            <th>GPT-5 (모델 A)</th>
+                            <th>Claude 4.6 (모델 B)</th>
+                            <th>Gemini 2.5 (모델 C)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>정확성</strong></td>
+                            <td>사실적 오류(환각) 및 정보 왜곡 여부</td>
+                            <td><span class="badge-score badge-score-4">4점</span></td>
+                            <td><span class="badge-score badge-score-4">4점</span></td>
+                            <td><span class="badge-score badge-score-3">3점</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>일관성</strong></td>
+                            <td>동일 질문 및 다회차 출력 시 안정성</td>
+                            <td><span class="badge-score badge-score-4">4점</span></td>
+                            <td><span class="badge-score badge-score-5">5점</span></td>
+                            <td><span class="badge-score badge-score-4">4점</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>가독성</strong></td>
+                            <td>한국어 서술 구조의 명확성 및 이모지 활용</td>
+                            <td><span class="badge-score badge-score-4">4점</span></td>
+                            <td><span class="badge-score badge-score-5">5점</span></td>
+                            <td><span class="badge-score badge-score-5">5점</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>지시문 준수</strong></td>
+                            <td>글자수 제한, 필수 개념 포함 등 규칙 이행</td>
+                            <td><span class="badge-score badge-score-4">4점</span></td>
+                            <td><span class="badge-score badge-score-5">5점</span></td>
+                            <td><span class="badge-score badge-score-4">4점</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>문맥 유지</strong></td>
+                            <td>10턴 이상 대화 시 이전 제약조건 보존도</td>
+                            <td><span class="badge-score badge-score-3">3점</span></td>
+                            <td><span class="badge-score badge-score-5">5점</span></td>
+                            <td><span class="badge-score badge-score-5">5점</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>예외 처리</strong></td>
+                            <td>모호한 명령에 대한 되묻기 등 제어 유연성</td>
+                            <td><span class="badge-score badge-score-4">4점</span></td>
+                            <td><span class="badge-score badge-score-4">4점</span></td>
+                            <td><span class="badge-score badge-score-4">4점</span></td>
+                        </tr>
+                        <tr style="background-color: var(--primary-light); font-weight: bold;">
+                            <td><strong>총점</strong></td>
+                            <td>최종 점수 합계 (30점 만점)</td>
+                            <td>23점 / 30점</td>
+                            <td style="color: var(--primary-dark);"><i class="fa-solid fa-trophy"></i> 28점 / 30점</td>
+                            <td>25점 / 30점</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-success">
+                <div class="callout-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="callout-content">
+                    <h4>🏆 최종 선정 모델: Claude Sonnet 4.6 (모델 B)</h4>
+                    <p>Claude 4.6은 복잡한 구조 통제(일관성) 및 장기 대화 턴 간 문맥 유지(문맥 유지) 항목에서 만점을 받으며 가장 우수한 성능을 보였습니다. 특히 10턴이 넘는 다중 대화 시나리오에서도 초기 제약 조건(쉬운 표현 치환, 학습 목표 강제 등)을 잃지 않고 일관된 출력을 보존하여 교육 가이드 생성 과업의 최적 모델로 채택되었습니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 2: Prompt Design -->
+        <div id="part2" class="section-card">
+            <h2 class="section-title"><i class="fa-solid fa-gears"></i> Part 2. 에이전트 시스템 및 프롬프트 설계</h2>
+            
+            <p>선정된 Claude 4.6을 제어하여 비개발자용 맞춤형 가이드를 출력하기 위한 페르소나 및 다단계 프롬프트를 설계했습니다.</p>
+
+            <div class="callout callout-info">
+                <div class="callout-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                <div class="callout-content">
+                    <h4>💡 페르소나 및 시스템 프롬프트 요약 (3대 핵심 원칙)</h4>
+                    <p>본 시스템 설계는 아래의 핵심 페르소나와 3대 원칙을 바탕으로 구성되었습니다.</p>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>페르소나:</strong> "프로젝트 매니저 출신 업무 자동화 코치" (초보자 관점에서 기술 개념을 번역하는 교육자)</li>
+                        <li><strong>원칙 1 (사실 검증 가능성):</strong> 확실하지 않은 내용은 환각(Hallucination)을 배제하고 검증 가능한 근거를 제시하거나 '확인 필요'로 표기함.</li>
+                        <li><strong>원칙 2 (부족하면 질문):</strong> 입력 데이터의 맥락이 모호하거나 정보가 부족할 경우, 자의적으로 단정 짓지 않고 사용자에게 확인 질문을 수행함.</li>
+                        <li><strong>원칙 3 (템플릿 강제):</strong> 정의된 구조(제목 ➔ 목차 ➔ 설명 ➔ 학습 목표)를 일관성 있게 강제 적용함.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>📋 시스템 프롬프트 (v2 - 최종 버전)</h3>
+            <div class="log-box" style="background-color: #1e1e38; color: #a5b4fc;">
+                <div class="log-turn-info">
+                    <span class="log-role role-ai"><i class="fa-solid fa-robot"></i> SYSTEM PROMPT v2</span>
+                </div>
+                # 역할정의<br>
+                당신은 "프로젝트 매니저 출신 업무 자동화 코치"입니다. 비개발자가 GitHub를 쉽게 배울 수 있도록 가이드하는 친절한 교육가입니다.<br><br>
+                
+                # 출력 양식 제약 사항<br>
+                모든 응답은 반드시 다음 구조를 순서대로 준수하십시오:<br>
+                1. 📘 보고서 제목 (주제와 톤에 어울리는 한글 작명)<br>
+                2. 🔄 전문 용어 ➔ 쉬운 표현 변환표 (커밋, 푸시 등 전문용어 ➔ 한글 치환 매핑 테이블 탑재)<br>
+                3. 각 목차별 설명 및 [🎯 학습 목표] 블록 (목차 서두에 학습자가 도달해야 할 구체적 목표 기재)<br>
+                4. 🗒️ 오늘 배운 것 한눈에 정리 (최종 요약 목록 3개 이상)<br><br>
+                
+                # 안전 조치 (환각 억제)<br>
+                1. 명확한 팩트, 사내 규정 또는 수치 정보가 본문에 없거나 모호한 경우 단정짓지 말고 반드시 **[⚠️ 확인 필요]** 섹션을 신설해 누락된 사항을 명시하십시오.<br>
+                2. 입력 데이터의 흐름이 모호할 경우 바로 요약하지 말고 확인 질문을 최대 3개까지 수행한 뒤 가이드를 작성하십시오.
+            </div>
+
+            <h3>💡 안전장치 Few-shot 예시 (검증용 예시 4)</h3>
+            <p>의도적으로 누락된 정보를 입력했을 때 AI가 자의적으로 상상하지 않고 '확인 필요'를 도출하도록 설계한 예시입니다.</p>
+            <div class="log-box" style="background-color: #fafafa; color: #334155; border: 1px solid #cbd5e1;">
+                <strong>[입력 예시]</strong><br>
+                "GitHub 리포지토리 설정 가이드를 만들어줘. 보안 설정(토큰 사용법)이랑 사내 협업 규정 정보도 포함해줘. 대신 확실한 내용만 알려줘."<br><br>
+                <strong>[출력 예시]</strong><br>
+                📘 GitHub 리포지토리 설정 및 보안 가이드<br>
+                [목차] ... 3. ⚠️ 확인 필요 (근거 부족 항목) ...<br>
+                [상세 및 안전 조치]<br>
+                - 보안 설정: PAT(개인 액세스 토큰)의 생성 및 권한 설정 범위를 명확히 안내합니다.<br>
+                - ⚠️ 확인 필요 (근거 부족 항목):<br>
+                  * 사내 협업 규정: 제공된 입력 정보에는 구체적인 사내 협업 정책(예: 브랜치 보호 규칙 등)이 누락되어 있습니다. 이 부분은 사내 보안 가이드라인을 참조하여 추가 검증이 필요합니다.
+            </div>
+            
+            <div class="callout callout-info" style="margin-top: 10px;">
+                <div class="callout-icon"><i class="fa-solid fa-circle-info"></i></div>
+                <div class="callout-content">
+                    <h4>🔍 설계 근거 (모델 검증 결과 연동)</h4>
+                    <p>실제 모델 비교 테스트 중 실시간 정보나 사내 정책처럼 외부 데이터가 누락된 질문을 받았을 때, **GPT-5(모델 A)**와 **Claude(모델 B)**는 임의로 사실을 조해내지 않고 <em>"정보가 부족하여 직접 확인이 필요하다"</em>라며 안전하게 답변을 제한하고 검증 방법을 역제안하여 <strong>Pass</strong> 판정을 받았습니다. 이 검증 결과를 기반으로 Few-shot 예시 4를 시스템 규칙으로 확정했습니다.</p>
+                </div>
+            </div>
+
+            <h3>🔄 프롬프트 개선 모델별 출력 대조 (v1 vs v2)</h3>
+            <p>단순 지시(v1)에서 시스템 프롬프트(v2) 규칙 적용으로 변화된 모델별 실제 출력 발췌 비교 테이블입니다.</p>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>모델</th>
+                            <th>v1 (일반 지시) 실제 출력 발췌</th>
+                            <th>v2 (시스템 설계 적용) 실제 출력 발췌</th>
+                            <th>주요 변화 및 개선점</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>GPT-5</strong></td>
+                            <td>"**핵심 개념**: Git vs GitHub: 버전 관리 도구(Git)와 코드를 호스팅하는 서비스..."</td>
+                            <td>"**말 바꾸기 안내**: 리포지토리 ➔ 프로젝트 폴더 / 커밋 ➔ 변경 내용 저장..."</td>
+                            <td>딱딱한 용어를 치환하는 <strong>'말 바꾸기 안내'</strong> 테이블과 구체적인 <strong>학습 목표</strong>가 단락마다 강제 렌더링됨.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Claude 4.6</strong></td>
+                            <td>"📘 **전체 구조**: 1. 들어가며 / 2. GitHub란 무엇인가? ... 4. 커밋과 푸시 이해하기..."</td>
+                            <td>"📘 **GitHub 입문자 가이드**<br>**변환표**: ❌ 커밋 ➔ ✅ 변경 내용 저장 / ❌ 푸시 ➔ ✅ 인터넷에 올리기...<br>**🎯 학습 목표**: 이 섹션을 읽고 나면..."</td>
+                            <td>영어식 전문용어가 상단 <strong>'쉬운 표현 변환표'</strong>로 정화되었으며, <strong>🎯 학습 목표</strong> 블록이 이모지와 함께 일관되게 규격화됨.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gemini 2.5</strong></td>
+                            <td>"**Repository (리포지토리)**: 프로젝트를 담는 하나의 폴더... **git add**: 바뀐 파일을 장바구니에..."</td>
+                            <td>"**필수 단어**: 변경 내용 저장(Commit): 게임에서 '저장!' 버튼 누르는 것... 온라인에 올리기(Push): 택배 보내기..."</td>
+                            <td>`마법 복제 종이`, `코드 택배` 등 왕초보 타겟에 최적화된 독창적인 <strong>한글 메타포</strong>가 적극 도입되어 전달력이 비약적으로 상승함.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Part 3: Scenario & Execution -->
+        <div id="part3" class="section-card">
+            <h2 class="section-title"><i class="fa-solid fa-receipt"></i> Part 3. 12턴 대화 실행 검증 및 시각화</h2>
+            
+            <p>설계된 에이전트 시스템이 실제 10턴 이상의 대화 흐름 속에서 사용자의 추가 요청, 조건 변경에 유연하게 대응하는지 장기 대화 검증을 진행했습니다.</p>
+            
+            <h3>💡 턴별 실제 대화 검증 로그 발췌</h3>
+            <p>원본 대화 로그 파일([모델 B_Claude_Sonnet4.6_대화_로그.txt](02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt))의 정확한 라인 번호를 연결하여 신뢰성을 확보한 실제 핵심 발췌 내역입니다.</p>
+
+            <div class="tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="openTab(event, 'turn1')">턴 1~2 (초기 생성)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'turn3')">턴 3~4 (쉬운 말)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'turn5')">턴 5~6 (학습목표)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'turn7')">턴 7~8 (협업 추가)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'turn9')">턴 9~10 (조건 변경)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'turn11')">턴 11~12 (자가 진단)</button>
+                </div>
+
+                <div id="turn1" class="tab-content active">
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-user">USER (L7)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L7" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L7)</a>
+                        </div>
+                        "GitHub를 처음 사용하는 사용자에게 적합한 보고서 개요를 만들어줘. 주제는 'GitHub 입문자를 위한 첫 리포지토리 작성 가이드'이고, 톤은 친절하게 해줘..."
+                    </div>
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-ai">AI (L9-L20)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L9-L20" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L9-L20)</a>
+                        </div>
+                        "📘 보고서 개요: GitHub 입문자를 위한 첫 리포지토리 작성 가이드<br>📋 전체 구조 한눈에 보기: 1. 들어가며 / 2. GitHub란 무엇인가? / 3. 첫 리포지토리 만들기..."
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--gray);"><i class="fa-solid fa-magnifying-glass"></i> <strong>분석</strong>: 요청 사항인 5대 필수 항목이 누락 없이 들어갔으나, 전문 기술 용어들이 변환 없이 노출되는 한계를 보였습니다.</p>
+                </div>
+
+                <div id="turn3" class="tab-content">
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-user">USER (L188)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L188" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L188)</a>
+                        </div>
+                        "가능한 쉬운 말로 설명해줘."
+                    </div>
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-ai">AI (L191-L224)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L191-L224" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L191-L224)</a>
+                        </div>
+                        "📁 리포지토리 ➔ 내 프로젝트 폴더<br>📸 커밋 ➔ 작업 내용 저장 (사진 찍기)<br>⬆️ 푸시 ➔ 저장한 내용을 인터넷에 올리기..."
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--gray);"><i class="fa-solid fa-magnifying-glass"></i> <strong>분석</strong>: 비개발자의 눈높이에 맞춰 일상 메타포(폴더, 사진 저장, 택배 등)를 적극 사용하여 난이도를 정상적으로 조정했습니다.</p>
+                </div>
+
+                <div id="turn5" class="tab-content">
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-user">USER (L376-L377)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L376-L377" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L376-L377)</a>
+                        </div>
+                        "각 항목마다 학습 목표도 넣어줘. 그리고 전문 용어 대신 쉬운 표현을 써줘. 예를 들면 '커밋'은 '변경 내용 저장'처럼."
+                    </div>
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-ai">AI (L379-L412)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L379-L412" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L379-L412)</a>
+                        </div>
+                        "🔄 전문 용어 ➔ 쉬운 표현 변환표<br>❌ 커밋(Commit) ➔ ✅ 변경 내용 저장  /  ❌ 푸시(Push) ➔ ✅ 인터넷에 올리기...<br>2️⃣ GitHub가 뭔가요?<br>🎯 학습 목표: ✔ GitHub가 어떤 서비스인지 설명할 수 있어요..."
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--gray);"><i class="fa-solid fa-magnifying-glass"></i> <strong>분석</strong>: 상단 용어 매핑 테이블이 고정 탑재되고, 각 장의 초입에 구체적인 학습 목표가 규격화되어 출력되기 시작했습니다.</p>
+                </div>
+
+                <div id="turn7" class="tab-content">
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-user">USER (L635-L636)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L635-L660" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L635)</a>
+                        </div>
+                        "목차에 '협업 사례'도 추가해줘. 그리고 'PR' 설명은 '코드 검토 요청'으로 쉽게 설명해줘."
+                    </div>
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-ai">AI (L638-L660)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L638-L660" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L638-L660)</a>
+                        </div>
+                        "6. 코드 검토 요청하기  ← PR을 쉽게 표현<br>7. 함께 일하는 방법 (협업 사례)  ← 새로 추가!<br>❌ PR(Pull Request) ➔ ✅ 코드 검토 요청"
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--gray);"><i class="fa-solid fa-magnifying-glass"></i> <strong>분석</strong>: 장기 문맥 속에서 기존의 규칙(학습 목표, 단어 변환)을 깨뜨리지 않고, 뒤늦게 유입된 신규 정보(협업 사례)를 논리적으로 병합하였습니다.</p>
+                </div>
+
+                <div id="turn9" class="tab-content">
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-user">USER (L891-L894)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L891" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L891)</a>
+                        </div>
+                        "톤은 더 친절하게, 그리고 확인 질문 없이 바로 결과를 보여줘."
+                    </div>
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-ai">AI (L896-L938)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L896-L938" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L896-L938)</a>
+                        </div>
+                        "이 가이드는 GitHub를 한 번도 써본 적 없는 분을 위해 만들었어요. 어려운 개발 용어는 최대한 일상 언어로 바꿔서 설명할게요. 끝까지 따라오면 나만의 첫 번째 프로젝트 폴더를 올릴 수 있어요! 🎉"
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--gray);"><i class="fa-solid fa-magnifying-glass"></i> <strong>분석</strong>: 말투가 눈에 띄게 친근해졌으며(이모지, 감정적 지지 문구 대폭 증가), 대기 또는 되묻기 동작 없이 즉시 전체 개요서를 렌더링했습니다.</p>
+                </div>
+
+                <div id="turn11" class="tab-content">
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-user">USER (L1140)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L1140" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L1140)</a>
+                        </div>
+                        "좋아. 필수 항목 누락 없는지 다시 확인해줘."
+                    </div>
+                    <div class="log-box">
+                        <div class="log-turn-info">
+                            <span class="log-role role-ai">AI (L1142-L1146)</span>
+                            <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L1142-L1146" class="log-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 보기 (L1142-L1146)</a>
+                        </div>
+                        "확인 결과 누락 없음. ✅ GitHub 개념 (2️⃣) / ✅ 리포지토리 생성 ➔ 프로젝트 폴더 (3️⃣) / ✅ 커밋/푸시 ➔ 변경 저장/올리기 (4️⃣) / ✅ 브랜치 ➔ 작업 공간 나누기 (5️⃣) / ✅ PR ➔ 코드 검토 요청 (6️⃣) / ✅ 협업 사례 (7️⃣)"
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--gray);"><i class="fa-solid fa-magnifying-glass"></i> <strong>분석</strong>: 장기 대화의 마지막 단계에서 AI가 설계 조건을 스스로 체크리스트화하여 누락이 없음을 선언하는 자가 검증(Self-Correction) 능력을 보여주었습니다.</p>
+                </div>
+            </div>
+
+            <h3>🎨 보너스 과제: 가이드북 멀티모달 시각 자료</h3>
+            <p>초보자용 가이드북의 이해를 돕기 위해 생성형 AI를 활용해 파스텔톤의 한글화된 고품질 삽화 이미지 3장을 제작하여 가이드북에 탑재했습니다.</p>
+            
+            <div class="image-grid">
+                <div class="image-card">
+                    <img src="03_etc/github_guide_cover.png" alt="가이드북 메인 북커버">
+                    <div class="image-info">
+                        <h4>1. 메인 북커버 (Cover)</h4>
+                        <p>파스텔 톤의 친근한 일러스트와 한글 타이틀("깃허브 입문 가이드")을 적용하여 초보 학습자의 진입 장벽을 낮춤.</p>
+                    </div>
+                </div>
+                <div class="image-card">
+                    <img src="03_etc/github_guide_toc.png" alt="가이드북 목차">
+                    <div class="image-info">
+                        <h4>2. 목차 페이지 (TOC)</h4>
+                        <p>책의 구조를 한눈에 보여주는 책갈피 형식의 디자인과 한글 "목차" 표기로 학습 순서 유도.</p>
+                    </div>
+                </div>
+                <div class="image-card">
+                    <img src="03_etc/github_guide_content.png" alt="가이드북 본문">
+                    <div class="image-info">
+                        <h4>3. 본문 개념도 (Commit & Push)</h4>
+                        <p>내 컴퓨터의 코드가 인터넷 저장소로 이동하는 핵심 워크플로우("커밋", "푸시")를 도식화한 일러스트.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p><i class="fa-solid fa-circle-info"></i> 본 문서는 20260415 코디세이 AI 네이티브 과정 B1-1 미션을 위해 자동 생성된 최종 보고서입니다.</p>
+        <p>실시간 차트 제어 및 데이터 저장은 <a href="03_etc/모델_비교_시각화.html"><i class="fa-solid fa-chart-line"></i> 모델 비교 시각화 대시보드</a>를 이용해 주세요.</p>
+        <p style="margin-top: 15px; font-size: 0.8rem; color: #64748b;">&copy; 2026 swmilk4u. All rights reserved.</p>
+    </footer>
+
+    <!-- Tab Script -->
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Smooth scroll for nav-links
+        document.querySelectorAll('.nav-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                document.querySelector(targetId).scrollIntoView({
+                    behavior: 'smooth'
+                });
+                
+                // Set active class
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
