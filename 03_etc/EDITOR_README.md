@@ -33,9 +33,9 @@ node server.js
 
 * **로컬 서버 웹 주소**:
   ```
-  http://localhost:4001/모델_비교_시각화.html
+  http://localhost:4001/index.html
   ```
-* **로컬 파일 바로 가기 (상대 경로)**: [모델_비교_시각화.html](모델_비교_시각화.html)
+* **로컬 파일 바로 가기 (상대 경로)**: [index.html](../index.html)
 
 ---
 
@@ -105,13 +105,14 @@ taskkill /PID [PID번호] /F
 ## 📁 파일 구조
 
 ```
-00_Code_B1-1/
-├── server.js              # Node.js 백엔드 서버
-├── package.json           # 의존성 설정
-├── 01_LLM모델_비교_및_선정_보고서.md
-├── 02_프롬프트_시스템_설계_문서.md
-├── 03_실행_로그.md
-└── 모델_비교_시각화.html  # 웹 에디터 & 시각화 통합 UI
+N_B1-1_LLM test/
+├── index.html             # 최종 보고서 및 대시보드 시각화 통합 웹사이트 (최상위 루트)
+└── 03_etc/
+    ├── server.js          # Node.js 백엔드 서버
+    ├── package.json       # 의존성 설정
+    ├── 01_LLM모델_비교_및_선정_보고서.md
+    ├── 02_프롬프트_시스템_설계_문서.md
+    └── 03_실행_로그.md
 ```
 
 ---
@@ -119,7 +120,7 @@ taskkill /PID [PID번호] /F
 ## 🔄 데이터 흐름
 
 ```
-웹 브라우저 (모델_비교_시각화.html)
+웹 브라우저 (index.html)
     ↓
     데이터 입력 및 수정
     ↓

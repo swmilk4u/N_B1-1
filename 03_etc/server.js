@@ -11,7 +11,7 @@ const PORT = 4001;
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-app.use(express.static('./'));
+app.use(express.static(path.join(__dirname, '../')));
 
 // 파일 경로
 const dir = __dirname;
@@ -243,5 +243,5 @@ ${scoreTableRows.join('\n')}`;
 // 서버 시작
 app.listen(PORT, () => {
     console.log(`✨ 서버가 http://localhost:4001에서 실행 중입니다`);
-    console.log(`📊 비교 분석 & 에디터: http://localhost:4001/모델_비교_시각화.html`);
+    console.log(`📊 비교 분석 & 통합 보고서: http://localhost:4001/index.html`);
 });
