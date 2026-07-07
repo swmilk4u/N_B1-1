@@ -160,7 +160,7 @@
         .image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin: 30px 0; }
         .image-card { background: white; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); transition: all 0.3s; }
         .image-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
-        .image-card img { width: 100%; height: 220px; object-fit: cover; border-bottom: 1px solid var(--border); }
+        .image-card img { width: 100%; height: auto; max-height: 380px; object-fit: contain; background: #fafbfc; border-bottom: 1px solid var(--border); }
         .image-info { padding: 20px; }
         .image-info h4 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: var(--dark); }
         .image-info p { font-size: 0.9rem; color: var(--gray); line-height: 1.5; }
@@ -1124,21 +1124,21 @@ GitHub 리포지토리 설정 가이드를 만들어줘. 보안 설정(토큰 �
                         <img src="03_etc/github_guide_cover.png" alt="GitHub 가이드 북커버">
                         <div class="image-info">
                             <h4>1. 메인 북커버 (Cover Design)</h4>
-                            <p><strong>디자인 컨셉</strong>: 표지에 명확한 한글 타이틀인 **'깃허브 입문 가이드'**를 포함하여 비개발자 독자의 진입장벽을 낮췄습니다. 폴더에서 아이디어가 마법처럼 뿜어져 나오는 비주얼과 친근한 캐릭터를 매칭하여 어렵게 느껴지는 GitHub의 시작을 시각적으로 완충하도록 유도했습니다.</p>
+                            <p>비개발자 독자가 친근하게 학습을 시작할 수 있도록 디자인한 가이드북 한글 표지입니다.</p>
                         </div>
                     </div>
                     <div class="image-card">
                         <img src="03_etc/github_guide_toc.png" alt="GitHub 가이드 목차">
                         <div class="image-info">
                             <h4>2. 가이드북 목차 (Table of Contents)</h4>
-                            <p><strong>디자인 컨셉</strong>: 헤더 영역에 직관적인 한글 **'목차'** 타이틀을 배치하고 미니멀한 레이아웃에 챕터별 아이콘을 제공하여 독자가 학습 흐름을 한눈에 파악할 수 있도록 도왔으며, 가이드북 전체의 일관성 유지를 위해 동일한 컬러 톤을 적용했습니다.</p>
+                            <p>챕터별 아이콘을 제공하여 전체적인 학습 흐름을 한눈에 파악할 수 있도록 도운 한글 목차입니다.</p>
                         </div>
                     </div>
                     <div class="image-card">
                         <img src="03_etc/github_guide_content.png" alt="GitHub 가이드 본문">
                         <div class="image-info">
                             <h4>3. 본문 개념 시각화 (Commit & Push)</h4>
-                            <p><strong>디자인 컨셉</strong>: 로컬 컴퓨터의 폴더 상태를 저장하는 **'커밋'** 과정과 이를 클라우드 원격 저장소로 내보내는 **'푸시'** 흐름을 직관적인 한글 라벨링, 방향 화살표 및 친근한 캐릭터 그래픽으로 나타내어 동작 방식을 직관적으로 이해할 수 있게 하였습니다.</p>
+                            <p>커밋(변경 내용 저장)과 푸시(온라인에 올리기)의 작업 흐름을 직관적으로 시각화한 다이어그램입니다.</p>
                         </div>
                     </div>
                 </div>
