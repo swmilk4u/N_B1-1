@@ -560,7 +560,14 @@
                 <p><strong>Zero-shot Prompting</strong>은 어떠한 입출력 예시(Shot) 쌍을 미리 제공하지 않고, 지시(Instruction)문과 시스템 규칙만으로 모델에게 즉각적인 응답을 얻어내는 기법입니다.</p>
                 <ul>
                     <li><strong>특징</strong>: 프롬프트 구성이 단순하고 토큰 소모가 적어 응답 속도 면에서 매우 효율적입니다.</li>
-                    <li><strong>한계</strong>: 모델의 생성 자유도가 높아 매 실행마다 출력 스키마(형식)의 준수율이 불완전하며, 답변의 친밀도나 톤앤매너를 일관성 있게 강제하기 어렵다는 단점이 있습니다.</li>
+                    <li><strong>한계</strong>: 모델의 생성 자유도가 높아 매 실행마다 출력 스키마(형식)의 준수율이 불완전하며, 답변의 친밀도나 톤앤매너를 일관성 있게 강제하기 어렵습니다.</li>
+                    <li><strong>실제 로그 예시 (02_source 연동)</strong>: 본 프로젝트 테스트의 <strong>1턴(초기 생성 요청)</strong>이 대표적인 Zero-shot 수행 사례입니다. 별도의 예시 제공 없이 가이드를 생성하도록 지시하여 모델별 출력 포맷의 편차가 가장 크게 나타난 지점입니다.
+                        <ul>
+                            <li><a href="02_source/%EB%AA%A8%EB%8D%B8%20A_GPT-5_%EB%8C%80%ED%99%94_%EB%A1%9C%EA%B7%B8.txt#L7" target="_blank" style="color: #3b82f6; text-decoration: underline;">[GPT-5 대화 로그 1턴 바로가기]</a></li>
+                            <li><a href="02_source/%EB%AA%A8%EB%8D%B8%20B_Claude_Sonnet4.6_%EB%8C%80%ED%99%94_%EB%A1%9C%EA%B7%B8.txt#L7" target="_blank" style="color: #3b82f6; text-decoration: underline;">[Claude 대화 로그 1턴 바로가기]</a></li>
+                            <li><a href="02_source/%EB%AA%A8%EB%8D%B8%20C_Gemini_2.5_Pro_%EB%8C%80%ED%99%94_%EB%A1%9C%EA%B7%B8.txt#L7" target="_blank" style="color: #3b82f6; text-decoration: underline;">[Gemini 대화 로그 1턴 바로가기]</a></li>
+                        </ul>
+                    </li>
                     <li><strong>보완</strong>: 이러한 출력 편차를 제어하기 위해 2.7절과 같이 정교하게 정의된 입출력 패턴을 미리 이식하는 <strong>Few-shot Prompting</strong>을 적용하여 시스템의 강건성을 보강합니다.</li>
                 </ul>
                 
