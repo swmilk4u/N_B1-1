@@ -629,6 +629,13 @@ GitHub 가이드 만들어줘.
 3. 원하시는 분위기나 말투가 있으신가요? (예: 친근하고 쉬운 어조 / 격식 있고 명료한 서술형 어조)
 
 알려주시면 바로 완벽하게 맞춰서 개요를 작성해 드릴게요!</div>
+                <div class="callout callout-info" style="margin-top: -15px; margin-bottom: 25px;">
+                    <div class="callout-icon"><i class="fa-solid fa-circle-info"></i></div>
+                    <div class="callout-content">
+                        <h4>💡 설계 해설 (Zero-shot 입력을 유도하는 Few-shot 작동 원리)</h4>
+                        <p>사용자는 아무런 사전 맥락 없이 단 1줄의 모호한 질문(Zero-shot 형태의 입력)을 던졌지만, 시스템 프롬프트에 내장된 Few-shot(예시 3)의 입출력 가이드 쌍 덕분에 AI가 스스로 단정 지어 오답을 날조하지 않고 안전한 확인 질문(역질문)을 던져 최종 Pass 판정을 유도하도록 구현된 핵심 설계입니다.</p>
+                    </div>
+                </div>
 
                 <h4>예시 4: 안전장치 적용 (근거 부족 항목에 대해 '확인 필요' 명시)</h4>
                 <div class="code-title">Input & Output 4</div>
@@ -652,7 +659,7 @@ GitHub 리포지토리 설정 가이드를 만들어줘. 보안 설정(토큰 �
                     <div class="callout-icon"><i class="fa-solid fa-circle-check"></i></div>
                     <div class="callout-content">
                         <h4>💡 설계 근거 (모델 검증 결과)</h4>
-                        <p>실제 모델 비교 테스트 중 실시간 정보나 사내 정책처럼 외부 데이터가 누락된 질문을 받았을 때, **GPT-5(모델 A)**와 **Claude(모델 B)**는 임의로 사실을 지어내지(날조하지) 않고 <em>"정보가 부족하여 직접 확인이 필요하다"</em>라며 안전하게 답변을 제한하고 검증 방법을 역제안하여 <strong>Pass</strong> 판정을 받았습니다. 이 검증 결과를 기반으로 Few-shot 예시 3을 설계하여 시스템에 이식했습니다.</p>
+                        <p>실제 모델 비교 테스트 중 실시간 정보나 사내 정책처럼 외부 데이터가 누락된 질문을 받았을 때, **GPT-5(모델 A)**와 **Claude(모델 B)**는 임의로 사실을 지어내지(날조하지) 않고 <em>"정보가 부족하여 직접 확인이 필요하다"</em>라며 안전하게 답변을 제한하고 검증 방법을 역제안하여 <strong>Pass</strong> 판정을 받았습니다. 이 검증 결과를 기반으로 Few-shot 예시 4를 설계하여 시스템에 이식했습니다.</p>
                     </div>
                 </div>
 
