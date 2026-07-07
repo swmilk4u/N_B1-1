@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLM 모델 비교·선정 및 프롬프트 시스템 설계 최종 보고서</title>
-    <!-- Google Fonts -->
+    <!-- Google Fonts & FontAwesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -24,18 +23,11 @@
             --gray: #64748b;
             --gray-light: #f8fafc;
             --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', 'Noto Sans KR', sans-serif;
             color: var(--dark);
@@ -44,806 +36,596 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Header & Hero Section */
+        /* Hero */
         .hero {
             background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 50%, #06b6d4 100%);
             color: white;
-            padding: 90px 20px;
+            padding: 80px 20px 60px 20px;
             text-align: center;
             position: relative;
-            overflow: hidden;
             box-shadow: var(--shadow-lg);
         }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        .hero-container {
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
+        .hero-container { max-width: 900px; margin: 0 auto; }
         .badge {
-            background-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.2);
             padding: 6px 16px;
             border-radius: 9999px;
             font-size: 0.85rem;
             font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
             display: inline-block;
             margin-bottom: 20px;
-            backdrop-filter: blur(4px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-
-        .hero h1 {
-            font-size: 2.8rem;
-            font-weight: 700;
-            line-height: 1.3;
-            margin-bottom: 25px;
-            letter-spacing: -0.02em;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.95);
-            font-weight: 300;
-            max-width: 750px;
-            margin: 0 auto 35px auto;
-        }
-
+        .hero h1 { font-size: 2.6rem; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.02em; }
+        .hero p { font-size: 1.15rem; color: rgba(255, 255, 255, 0.95); margin-bottom: 30px; font-weight: 300; }
         .btn-dashboard {
             display: inline-flex;
             align-items: center;
-            background-color: white;
+            background: white;
             color: var(--primary);
-            padding: 15px 30px;
+            padding: 14px 28px;
             border-radius: 12px;
             font-weight: 600;
             text-decoration: none;
             box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-            transition: var(--transition);
+            transition: all 0.3s;
             gap: 10px;
         }
+        .btn-dashboard:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
 
-        .btn-dashboard:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-            background-color: #f8fafc;
-        }
-
-        /* Sticky Navigation Bar */
+        /* Navbar & Main */
         .navbar {
-            background-color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            padding: 15px 20px;
-        }
-
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; gap: 20px; padding: 12px 20px; flex-wrap: wrap; }
         .nav-link {
             color: var(--gray);
             text-decoration: none;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 500;
-            transition: var(--transition);
             padding: 6px 12px;
             border-radius: 6px;
+            transition: all 0.2s;
         }
+        .nav-link:hover, .nav-link.active { color: var(--primary); background: var(--primary-light); }
 
-        .nav-link:hover, .nav-link.active {
-            color: var(--primary);
-            background-color: var(--primary-light);
-        }
+        .main-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; display: grid; gap: 40px; }
+        .section-card { background: white; border-radius: 20px; padding: 40px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .section-title { font-size: 1.8rem; margin-bottom: 25px; border-bottom: 2px solid var(--primary-light); padding-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: var(--primary); }
 
-        /* Main Layout */
-        .main-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 40px;
-        }
+        /* Sub layout */
+        h3 { font-size: 1.3rem; margin: 35px 0 15px 0; border-left: 4px solid var(--primary); padding-left: 12px; color: var(--dark); }
+        h4 { font-size: 1.1rem; margin: 20px 0 10px 0; color: var(--gray-dark); }
+        p { margin-bottom: 15px; color: #334155; }
+        ul, ol { margin: 15px 0 20px 25px; color: #334155; }
+        li { margin-bottom: 8px; }
+        strong { color: var(--dark); }
 
-        .section-card {
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            padding: 40px;
-            border: 1px solid var(--border);
-        }
+        /* Table */
+        .table-responsive { overflow-x: auto; margin: 20px 0; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th { background: var(--gray-light); color: var(--dark); font-weight: 600; padding: 14px 18px; border-bottom: 2px solid var(--border); }
+        td { padding: 14px 18px; border-bottom: 1px solid var(--border); color: #334155; vertical-align: top; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8fafc; }
 
-        .section-title {
-            font-size: 1.8rem;
-            color: var(--dark);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 2px solid var(--primary-light);
-            padding-bottom: 12px;
-        }
+        /* Badges */
+        .badge-score { display: inline-block; padding: 3px 8px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; text-align: center; }
+        .badge-score-5 { background: #d1fae5; color: #065f46; }
+        .badge-score-4 { background: #ecfdf5; color: #047857; }
+        .badge-score-3 { background: #fef3c7; color: #92400e; }
+        .badge-score-2 { background: #fee2e2; color: #991b1b; }
 
-        .section-title i {
-            color: var(--primary);
-        }
+        /* Callouts */
+        .callout { padding: 20px; border-radius: 12px; margin: 25px 0; display: flex; gap: 15px; border-left: 5px solid transparent; }
+        .callout-info { background: #eff6ff; border-left-color: #3b82f6; color: #1e3a8a; }
+        .callout-warning { background: #fffbeb; border-left-color: #f59e0b; color: #78350f; }
+        .callout-success { background: #ecfdf5; border-left-color: #10b981; color: #065f46; }
+        .callout-icon { font-size: 1.3rem; margin-top: 2px; }
+        .callout-content h4 { font-weight: 600; margin-bottom: 6px; }
+        .callout-content p { font-size: 0.95rem; margin-bottom: 0; }
 
-        /* Data Tables */
-        .table-responsive {
-            overflow-x: auto;
-            margin: 20px 0 30px 0;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-        }
+        blockquote { background: #f8fafc; border-left: 4px solid var(--gray); padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; font-style: italic; color: #475569; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-            background-color: white;
-        }
+        /* Code Block */
+        .code-title { background: #0f172a; color: #94a3b8; padding: 8px 16px; font-size: 0.8rem; font-weight: 600; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom: 1px solid #1e293b; font-family: monospace; display: flex; justify-content: space-between; }
+        .log-box { background: #1e293b; color: #e2e8f0; padding: 20px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem; overflow-x: auto; margin-bottom: 25px; border: 1px solid #334155; border-top: none; white-space: pre-wrap; }
 
-        th {
-            background-color: var(--gray-light);
-            color: var(--dark);
-            font-weight: 600;
-            text-align: left;
-            padding: 14px 18px;
-            border-bottom: 2px solid var(--border);
-        }
+        /* Tabs */
+        .tabs { margin: 25px 0; }
+        .tab-buttons { display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
+        .tab-btn { background: none; border: none; padding: 10px 16px; font-size: 0.9rem; font-weight: 500; color: var(--gray); cursor: pointer; border-radius: 8px; transition: all 0.2s; white-space: nowrap; }
+        .tab-btn:hover { color: var(--primary); background: var(--gray-light); }
+        .tab-btn.active { color: white; background: var(--primary); }
+        .tab-content { display: none; padding: 20px 0; }
+        .tab-content.active { display: block; }
+        .log-turn-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .log-role { font-weight: 600; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; }
+        .role-user { background: #3b82f6; color: white; }
+        .role-ai { background: #10b981; color: white; }
+        .log-link { font-size: 0.85rem; color: #3b82f6; text-decoration: none; font-weight: 500; }
+        .log-link:hover { text-decoration: underline; }
 
-        td {
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border);
-            color: #334155;
-            vertical-align: top;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background-color: #f8fafc;
-        }
-
-        /* Custom Badges in Tables */
-        .badge-model {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            display: inline-block;
-        }
-        .badge-gpt { background-color: #ffe4e6; color: #be123c; }
-        .badge-claude { background-color: #dbeafe; color: #1d4ed8; }
-        .badge-gemini { background-color: #e0f2fe; color: #0369a1; }
-        
-        .badge-score {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-        .badge-score-5 { background-color: #d1fae5; color: #065f46; }
-        .badge-score-4 { background-color: #ecfdf5; color: #047857; }
-        .badge-score-3 { background-color: #fef3c7; color: #92400e; }
-        .badge-score-2 { background-color: #fee2e2; color: #991b1b; }
-
-        /* Callout Boxes (Alerts) */
-        .callout {
-            padding: 20px;
-            border-radius: 12px;
-            margin: 25px 0;
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
-            border-left: 5px solid transparent;
-        }
-
-        .callout-info {
-            background-color: #eff6ff;
-            border-left-color: #3b82f6;
-            color: #1e3a8a;
-        }
-        .callout-info i { color: #3b82f6; }
-
-        .callout-warning {
-            background-color: #fffbeb;
-            border-left-color: #f59e0b;
-            color: #78350f;
-        }
-        .callout-warning i { color: #f59e0b; }
-
-        .callout-success {
-            background-color: #ecfdf5;
-            border-left-color: #10b981;
-            color: #065f46;
-        }
-        .callout-success i { color: #10b981; }
-
-        .callout-icon {
-            font-size: 1.25rem;
-            margin-top: 2px;
-        }
-
-        .callout-content h4 {
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .callout-content p {
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        /* General Typography */
-        h3 {
-            font-size: 1.3rem;
-            color: var(--dark);
-            margin: 35px 0 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-left: 4px solid var(--primary);
-            padding-left: 10px;
-        }
-
-        p {
-            margin-bottom: 15px;
-            color: #334155;
-        }
-
-        ul, ol {
-            margin: 15px 0 20px 25px;
-            color: #334155;
-        }
-
-        li {
-            margin-bottom: 8px;
-        }
-
-        /* Image Display Grid */
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            margin: 30px 0;
-        }
-
-        .image-card {
-            background-color: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: var(--transition);
-        }
-
-        .image-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .image-card img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .image-info {
-            padding: 20px;
-        }
-
-        .image-info h4 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--dark);
-        }
-
-        .image-info p {
-            font-size: 0.9rem;
-            color: var(--gray);
-            line-height: 1.5;
-        }
-
-        /* Code & Log Blocks */
-        .code-title {
-            background-color: #0f172a;
-            color: #94a3b8;
-            padding: 8px 16px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-            border-bottom: 1px solid #1e293b;
-            font-family: monospace;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .log-box {
-            background-color: #1e293b;
-            color: #e2e8f0;
-            padding: 20px;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
-            margin-bottom: 25px;
-            border: 1px solid #334155;
-            border-top: none;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-            white-space: pre-wrap;
-        }
-
-        /* Tab Layout for Logs */
-        .tabs {
-            margin: 25px 0;
-        }
-
-        .tab-buttons {
-            display: flex;
-            gap: 8px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-            overflow-x: auto;
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 10px 18px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--gray);
-            cursor: pointer;
-            border-radius: 8px;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-
-        .tab-btn:hover {
-            color: var(--primary);
-            background-color: var(--gray-light);
-        }
-
-        .tab-btn.active {
-            color: white;
-            background-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-            padding: 20px 0;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .log-turn-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .log-role {
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-        }
-        .role-user { background-color: #3b82f6; color: white; }
-        .role-ai { background-color: #10b981; color: white; }
-
-        .log-link {
-            font-size: 0.85rem;
-            color: #3b82f6;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .log-link:hover {
-            text-decoration: underline;
-        }
+        /* Image Gallery */
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin: 30px 0; }
+        .image-card { background: white; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); transition: all 0.3s; }
+        .image-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .image-card img { width: 100%; height: 220px; object-fit: cover; border-bottom: 1px solid var(--border); }
+        .image-info { padding: 20px; }
+        .image-info h4 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: var(--dark); }
+        .image-info p { font-size: 0.9rem; color: var(--gray); line-height: 1.5; }
 
         /* Footer */
-        footer {
-            background-color: var(--dark);
-            color: #94a3b8;
-            padding: 60px 20px;
-            text-align: center;
-            font-size: 0.9rem;
-            margin-top: 80px;
-            border-top: 1px solid #1e293b;
-        }
-
-        footer p {
-            margin-bottom: 10px;
-            color: #94a3b8;
-        }
-
-        footer a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        footer a:hover {
-            color: #a5b4fc;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-            .hero p {
-                font-size: 1rem;
-            }
-            .section-card {
-                padding: 20px;
-            }
-            .nav-container {
-                gap: 15px;
-                padding: 10px;
-                flex-wrap: wrap;
-            }
-            .nav-link {
-                font-size: 0.85rem;
-                padding: 4px 8px;
-            }
-        }
+        footer { background: var(--dark); color: #94a3b8; padding: 50px 20px; text-align: center; font-size: 0.9rem; margin-top: 80px; border-top: 1px solid #1e293b; }
+        footer p { margin-bottom: 8px; color: #94a3b8; }
+        footer a { color: white; text-decoration: none; font-weight: 500; }
+        footer a:hover { color: #a5b4fc; }
     </style>
 </head>
 <body>
 
-    <!-- Hero Section -->
+    <!-- Hero -->
     <div class="hero">
         <div class="hero-container">
-            <span class="badge"><i class="fa-solid fa-graduation-cap"></i> 코디세이 AI 네이티브 과정 - B1-1 과제</span>
+            <span class="badge"><i class="fa-solid fa-graduation-cap"></i> 실전 학습 과제 B1-1</span>
             <h1>LLM 모델 비교·선정 및<br>프롬프트 시스템 설계 최종 보고서</h1>
-            <p>비개발자 교육용 "GitHub 첫 걸음 가이드북 개요" 작성을 최적으로 수행하는 LLM을 선정하고, 형식 통제 및 환각 억제를 위한 에이전트 프롬프트 시스템을 설계·검증한 최종 보고서 웹 뷰어입니다.</p>
+            <p>이 프로젝트는 대규모 언어 모델(LLM)의 작동 원리를 이해하고, 프롬프트 엔지니어링을 통해 원하는 텍스트 결과물을 정교하게 제어하는 기술을 익히기 위한 실전 학습 과제입니다.</p>
             <a href="03_etc/모델_비교_시각화.html" class="btn-dashboard">
                 <i class="fa-solid fa-chart-line"></i> 실시간 대시보드 및 에디터 열기
             </a>
         </div>
     </div>
 
-    <!-- Sticky Navigation Bar -->
+    <!-- Sticky Navbar -->
     <div class="navbar">
         <div class="nav-container">
             <a href="#part1" class="nav-link"><i class="fa-solid fa-scale-balanced"></i> Part 1. 모델 비교 및 선정</a>
             <a href="#part2" class="nav-link"><i class="fa-solid fa-gears"></i> Part 2. 프롬프트 시스템 설계</a>
-            <a href="#part3" class="nav-link"><i class="fa-solid fa-receipt"></i> Part 3. 시나리오 실행 및 검증</a>
+            <a href="#part3" class="nav-link"><i class="fa-solid fa-receipt"></i> Part 3. 실행 로그 및 검증</a>
+            <a href="#answers" class="nav-link"><i class="fa-solid fa-graduation-cap"></i> 과제 목표 답변</a>
         </div>
     </div>
 
-    <!-- Main Container -->
+    <!-- Main Content -->
     <div class="main-container">
 
-        <!-- Part 1: Model Comparison -->
+        <!-- Part 1 -->
         <div id="part1" class="section-card">
-            <h2 class="section-title"><i class="fa-solid fa-scale-balanced"></i> Part 1. LLM 모델 비교 및 선정 보고서</h2>
+            <h2 class="section-title"><i class="fa-solid fa-scale-balanced"></i> Part 1. 모델 비교·선정 보고서</h2>
             
-            <p>동일한 "회의록 및 설명 개요 요약" 과업에 대해 3종의 최신 대규모 언어 모델(GPT-5, Claude 4.6, Gemini 2.5 Pro)을 웹(Naito) 인터페이스 환경에서 6개 핵심 평가 축을 기준으로 5점 척도 정량 평가를 실시하였습니다.</p>
-            
-            <h3>1.1 사용 환경 정보</h3>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>비교 모델</th>
-                            <th>요금제 / 연동 채널</th>
-                            <th>사용 일자</th>
-                            <th>주요 설정 (Parameters)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>모델 A: GPT-5</strong></td>
-                            <td>Naito Pro 구독 채널</td>
-                            <td>2026.06.04</td>
-                            <td>Temperature = 0.5, System Rules 고정</td>
-                        </tr>
-                        <tr>
-                            <td><strong>모델 B: Claude 4.6 (Sonnet)</strong></td>
-                            <td>Naito Pro 구독 채널</td>
-                            <td>2026.06.04</td>
-                            <td>Temperature = 0.5, System Rules 고정</td>
-                        </tr>
-                        <tr>
-                            <td><strong>모델 C: Gemini 2.5 Pro</strong></td>
-                            <td>Naito Advanced 구독 채널</td>
-                            <td>2026.06.04</td>
-                            <td>Temperature = 0.5, System Rules 고정</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h3>1.2 평가 항목 및 기준</h3>
-            <p>비개발자용 교육용 보고서를 설계하는 과업 특성을 반영하여 6가지의 척도로 평가를 세분화하였습니다.</p>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>평가 항목</th>
-                            <th>5점 (우수)</th>
-                            <th>3점 (보통)</th>
-                            <th>1점 (미흡)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>정확성 (Accuracy)</strong></td>
-                            <td>제시된 원문 정보만 활용, 환각 없음</td>
-                            <td>추측성 정보 1~2개 포함, 대세 지장 없음</td>
-                            <td>허구 정보를 사실처럼 서술 (심각한 환각)</td>
-                        </tr>
-                        <tr>
-                            <td><strong>일관성 (Consistency)</strong></td>
-                            <td>재실행 시 양식 및 톤앤매너 100% 동일</td>
-                            <td>반복 실행 시 일부 양식 흐트러짐</td>
-                            <td>동일 질문에 매번 완전히 다른 형태 출력</td>
-                        </tr>
-                        <tr>
-                            <td><strong>가독성 (Readability)</strong></td>
-                            <td>쉬운 우리말 표현, 적절한 이모지 및 표</td>
-                            <td>전문용어가 섞여 있으나 대략적 이해 가능</td>
-                            <td>번역체 가득하고 가독성이 현저히 떨어짐</td>
-                        </tr>
-                        <tr>
-                            <td><strong>지시문 준수 (Instruction)</strong></td>
-                            <td>목차 범위, 분량 제약 완벽 수행</td>
-                            <td>필수 항목 중 일부 누락되거나 분량 초과</td>
-                            <td>지시 사항을 무시하고 일반 응답 생성</td>
-                        </tr>
-                        <tr>
-                            <td><strong>문맥 유지 (Context)</strong></td>
-                            <td>10턴 이상 대화 시 초기 조건 유지</td>
-                            <td>5턴 전후로 조건 망각 시작</td>
-                            <td>다음 턴 질문 시 바로 직전 규칙도 망각</td>
-                        </tr>
-                        <tr>
-                            <td><strong>예외 처리 (Exception)</strong></td>
-                            <td>모호한 지시에 되묻고 안전성 확보</td>
-                            <td>의도를 추측하여 무작정 대답함</td>
-                            <td>오작동 또는 비정상적인 답변 반환</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h3>1.3 모델 평가 결과 및 비교 평점</h3>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>평가 항목 (축)</th>
-                            <th>GPT-5 (모델 A)</th>
-                            <th>Claude 4.6 (모델 B)</th>
-                            <th>Gemini 2.5 Pro (모델 C)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>1. 정확성 (Accuracy)</strong></td>
-                            <td><span class="badge-score badge-score-4">4점</span></td>
-                            <td><span class="badge-score badge-score-4">4점</span></td>
-                            <td><span class="badge-score badge-score-3">3점</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>2. 일관성 (Consistency)</strong></td>
-                            <td><span class="badge-score badge-score-4">4점</span></td>
-                            <td><span class="badge-score badge-score-5">5점</span></td>
-                            <td><span class="badge-score badge-score-4">4점</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>3. 가독성 (Readability)</strong></td>
-                            <td><span class="badge-score badge-score-4">4점</span></td>
-                            <td><span class="badge-score badge-score-5">5점</span></td>
-                            <td><span class="badge-score badge-score-5">5점</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>4. 지시문 준수 (Instruction)</strong></td>
-                            <td><span class="badge-score badge-score-4">4점</span></td>
-                            <td><span class="badge-score badge-score-5">5점</span></td>
-                            <td><span class="badge-score badge-score-4">4점</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>5. 문맥 유지 (Context)</strong></td>
-                            <td><span class="badge-score badge-score-3">3점</span></td>
-                            <td><span class="badge-score badge-score-5">5점</span></td>
-                            <td><span class="badge-score badge-score-5">5점</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>6. 예외 처리 (Exception)</strong></td>
-                            <td><span class="badge-score badge-score-4">4점</span></td>
-                            <td><span class="badge-score badge-score-4">4점</span></td>
-                            <td><span class="badge-score badge-score-4">4점</span></td>
-                        </tr>
-                        <tr style="background-color: var(--primary-light); font-weight: bold;">
-                            <td><strong>종합 점수 합계</strong></td>
-                            <td>23점 / 30점</td>
-                            <td style="color: var(--primary-dark); font-weight: 700;"><i class="fa-solid fa-trophy"></i> 28점 / 30점</td>
-                            <td>25점 / 30점</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h3>1.4 평가 축별 세부 근거 (대화 로그 기반)</h3>
+            <h3>1.1 비교 목적</h3>
             <ul>
-                <li><strong>정확성</strong>: 실시간 정보(오늘 날짜) 등 외부 리소스 부재 시 GPT-5와 Claude는 사실적 오류(환각)를 내지 않고 안전하게 거절하여 Pass 판정을 받았습니다. 반면 Gemini 2.5 Pro는 날짜 정보가 차단된 상태에서도 자의적 억측으로 대답해 3점을 부여했습니다.</li>
-                <li><strong>일관성</strong>: Claude 4.6은 여러 번 반복 생성해도 지정한 용어 변환표와 각 목차의 학습 목표 블록 양식을 흐트러짐 없이 일정하게 출력했습니다.</li>
-                <li><strong>가독성</strong>: Gemini와 Claude는 '게임 세이브 포인트', '마법 복제 종이', '코드 택배' 등 한국어 화자 및 초보자 맞춤형 비유와 한글 순화를 탁월하게 제시했습니다.</li>
-                <li><strong>지시문 준수</strong>: Claude 4.6은 목차 수(8개 고정) 및 이모지 사용 여부를 완벽히 이행했습니다. GPT-5는 다회차 생성 시 목차 수가 9개로 늘어나는 양식 이탈이 관찰되었습니다.</li>
-                <li><strong>문맥 유지</strong>: Claude 4.6과 Gemini는 10턴이 넘어가는 다중 대화 속에서도 턴 3의 '쉬운 말 치환'과 턴 5의 '학습 목표' 등 이전 턴에 정립된 누적 조건들을 끝까지 기억하며 대답했습니다.</li>
+                <li>동일한 업무 과업(보고서 개요 생성)을 3종 LLM에 적용하여 성능을 비교</li>
+                <li>정량적 평가 축(6개)과 근거 기반으로 최적 모델을 선정</li>
+                <li>"느낌"이 아닌 재현 가능한 평가 기준과 데이터로 선택 사유를 설명</li>
             </ul>
 
-            <div class="callout callout-success">
-                <div class="callout-icon"><i class="fa-solid fa-square-poll-vertical"></i></div>
-                <div class="callout-content">
-                    <h4>📝 최종 선정 결론 (Claude Sonnet 4.6 채택)</h4>
-                    <p>비개발자용 교육 자료 설계에 있어 가장 중요한 역량은 <strong>"지속적으로 제약 규칙을 누락 없이 유지하는 것(문맥 유지)"</strong>과 <strong>"지정된 템플릿 양식을 어기지 않는 것(일관성·지시문 준수)"</strong>입니다. Claude 4.6은 이 세 가지 지표에서 감점 없이 만점(5점)을 기록하며 종합 점수 28점으로 최종 최적 모델로 채택되었습니다. 10턴 이상의 장기 협업 시나리오에서도 교육 코치 페르소나를 안정적으로 유지했습니다.</p>
-                </div>
+            <h3>1.2 비교 대상 모델</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>항목</th>
+                            <th>모델 A</th>
+                            <th>모델 B</th>
+                            <th>모델 C</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>모델명</strong></td>
+                            <td><span class="badge-model badge-gpt">GPT-5 (x1)</span></td>
+                            <td><span class="badge-model badge-claude">Claude Sonnet 4.6 (x1)</span></td>
+                            <td><span class="badge-model badge-gemini">Gemini 2.5 Pro (x1)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>개발사</strong></td>
+                            <td>OpenAI</td>
+                            <td>Anthropic</td>
+                            <td>Google</td>
+                        </tr>
+                        <tr>
+                            <td><strong>사용 채널</strong></td>
+                            <td>웹 (네이토)</td>
+                            <td>웹 (네이토)</td>
+                            <td>웹 (네이토)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>요금제</strong></td>
+                            <td>유료 (네이토 구독)</td>
+                            <td>유료 (네이토 구독)</td>
+                            <td>유료 (네이토 구독)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>사용 날짜</strong></td>
+                            <td>2026-06-04</td>
+                            <td>2026-06-04</td>
+                            <td>2026-06-04</td>
+                        </tr>
+                        <tr>
+                            <td><strong>주요 설정</strong></td>
+                            <td>웹 기본값 (세부 설정 없음)</td>
+                            <td>웹 기본값</td>
+                            <td>웹 기본값</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+            <blockquote>
+                세 모델 모두 동일한 x1 토큰량을 사용하며, 서로 다른 회사의 대표 모델이라는 점에서 적절한 비교군을 구성했습니다.<br>
+                네이토 웹 채팅에서는 AI 응답의 세부 설정을 직접 바꿀 수 없어서, 세 모델 모두 기본 설정 그대로 같은 조건에서 비교했습니다.
+            </blockquote>
+
+            <h3>1.3 동일 입력 (테스트 프롬프트)</h3>
+            <div class="code-title">입력 템플릿</div>
+            <div class="log-box">[업무 과업]: 보고서 개요 생성
+[보고서 주제]: GitHub 입문자를 위한 첫 리포지토리 작성 가이드
+[목적]: GitHub 기본 용어와 사용법을 쉽게 이해시키기 위해
+[대상 독자]: GitHub를 처음 접하는 비개발자
+[톤]: 친절하고 초보자 친화적
+[필수 포함 항목]: GitHub 개념, 리포지토리(프로젝트 폴더) 생성, 커밋(변경 저장)/푸시(올리기), 브랜치(작업 복사본), PR(코드 검토 요청) 기본
+[금지 사항]: 전문 용어 과다 사용 금지, 추측성 표현 금지</div>
+
+            <h4>대화 시나리오 (10턴 공통)</h4>
+            <ol>
+                <li>보고서 개요 생성 요청 (초기 입력)</li>
+                <li>쉬운 말로 설명 요청</li>
+                <li>항목별 학습 목표 추가 + 전문 용어를 쉬운 표현으로 변경</li>
+                <li>협업 사례 추가 + PR을 "코드 검토 요청"으로 변경</li>
+                <li>톤 변경 (더 친절하게) + 확인 질문 없이 바로 결과 제공</li>
+            </ol>
+
+            <h3>1.4 평가 축 및 점수표</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>평가 축</th>
+                            <th>설명</th>
+                            <th>GPT-5</th>
+                            <th>Claude 4.6</th>
+                            <th>Gemini 2.5 Pro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>① 정확성</strong></td>
+                            <td>사실·수치·문맥 대응 정확도</td>
+                            <td><span class="badge-score badge-score-5">5</span></td>
+                            <td><span class="badge-score badge-score-5">5</span></td>
+                            <td><span class="badge-score badge-score-5">5</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>② 한국어 자연스러움</strong></td>
+                            <td>한국어 표현의 유창성/자연스러움</td>
+                            <td><span class="badge-score badge-score-4">4</span></td>
+                            <td><span class="badge-score badge-score-5">5</span></td>
+                            <td><span class="badge-score badge-score-3">3</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>③ 형식 준수</strong></td>
+                            <td>템플릿/출력 규칙 준수</td>
+                            <td><span class="badge-score badge-score-5">5</span></td>
+                            <td><span class="badge-score badge-score-5">5</span></td>
+                            <td><span class="badge-score badge-score-4">4</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>④ 문맥 유지</strong></td>
+                            <td>10턴 대화 시 문맥 유지 능력</td>
+                            <td><span class="badge-score badge-score-4">4</span></td>
+                            <td><span class="badge-score badge-score-5">5</span></td>
+                            <td><span class="badge-score badge-score-4">4</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>⑤ 응답 속도</strong></td>
+                            <td>결과 출력 속도 및 안정성</td>
+                            <td><span class="badge-score badge-score-5">5</span></td>
+                            <td><span class="badge-score badge-score-4">4</span></td>
+                            <td><span class="badge-score badge-score-5">5</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>⑥ 비용 효율</strong></td>
+                            <td>토큰 비용 또는 요금 대비 성능</td>
+                            <td><span class="badge-score badge-score-4">4</span></td>
+                            <td><span class="badge-score badge-score-5">5</span></td>
+                            <td><span class="badge-score badge-score-4">4</span></td>
+                        </tr>
+                        <tr style="background: var(--primary-light); font-weight: bold;">
+                            <td colspan="2"><strong>총점</strong></td>
+                            <td><strong>27 / 30</strong></td>
+                            <td style="color: var(--primary-dark);"><i class="fa-solid fa-trophy"></i> <strong>29 / 30</strong></td>
+                            <td><strong>25 / 30</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>평가 축별 근거</h4>
+            <p><strong>① 정확성 (GPT-5: 5 / Claude: 5 / Gemini: 5)</strong></p>
+            <ul>
+                <li>세 모델 모두 Git/GitHub의 핵심 개념(커밋, 푸시, 브랜치, PR)을 정확하게 설명함.</li>
+                <li>단, 날짜/시간 관련 질문에서 Gemini만 정확히 답변, GPT-5와 Claude는 답변 불가 (환각 발생 없이 안전하게 "모름" 처리).</li>
+            </ul>
+            <p><strong>② 한국어 자연스러움 (GPT-5: 4 / Claude: 5 / Gemini: 3)</strong></p>
+            <ul>
+                <li><strong>GPT-5</strong>: 전반적으로 무난하나, "비공개 설정을 안내합니다" 같은 다소 건조한 서술체가 간혹 등장.</li>
+                <li><strong>Claude</strong>: "처음엔 누구나 낯설고 어렵게 느껴져요" 등 대화체와 격려 표현이 자연스럽고 친근함.</li>
+                <li><strong>Gemini</strong>: "왕초보 맞춤!" 같은 비유가 재미있으나, 일부 구간에서 "물론이죠!" 등 기계적인 번역체 어투가 감지됨.</li>
+            </ul>
+            <p><strong>③ 형식 준수 (GPT-5: 5 / Claude: 5 / Gemini: 4)</strong></p>
+            <ul>
+                <li><strong>GPT-5/Claude</strong>: 제목→목차→항목별 설명→학습 목표 구조를 10턴 내내 일관되게 유지.</li>
+                <li><strong>Gemini</strong>: 턴 4~5에서 목차 번호 체계가 한 번 바뀌고(1→Step 1), 이전 턴의 형식과 미세하게 이탈.</li>
+            </ul>
+            <p><strong>④ 문맥 유지 (GPT-5: 4 / Claude: 5 / Gemini: 4)</strong></p>
+            <ul>
+                <li><strong>GPT-5</strong>: "말 바꾸기 안내" 테이블을 잘 제시했으나, 턴 5의 친절화 톤 변경 반영이 Claude 대비 한 템포 지연됨.</li>
+                <li><strong>Claude</strong>: 톤 변경 요청 후에도 이전 확정사항(쉬운 표현, 필수 항목)을 누락 없이 완벽 보존.</li>
+                <li><strong>Gemini</strong>: 협업 사례 추가 시 구조는 잘 유지했으나, 턴 4에서 "PR"을 "코드 검토 요청"으로 바꾸라는 요청 이전에 "풀 리퀘스트"가 일부 혼용됨.</li>
+            </ul>
+            <p><strong>⑤ 응답 속도 (GPT-5: 5 / Claude: 4 / Gemini: 5)</strong></p>
+            <ul>
+                <li><strong>GPT-5/Gemini</strong>: 평균 3~5초 내 응답 완료, 대기 지연 없이 안정적.</li>
+                <li><strong>Claude</strong>: 평균 5~8초로 타 모델 대비 2~3초 느린 속도를 보임.</li>
+            </ul>
+            <p><strong>⑥ 비용 효율 (GPT-5: 4 / Claude: 5 / Gemini: 4)</strong></p>
+            <ul>
+                <li><strong>Claude</strong>: 동일 토큰량(x1) 대비 한국어 품질과 문맥 유지가 가장 우수하여 현업 보정 작업이 불필요하므로 가성비 최상으로 판단.</li>
+            </ul>
+
+            <h3>1.5 모델별 결과 요약</h3>
+            <p><strong>모델 A (GPT-5)</strong>: 필수 항목을 모두 반영하고 형식이 일관되나, 한국어 말투가 건조하여 초보자 가독성이 상대적으로 낮음.</p>
+            <p><strong>모델 B (Claude Sonnet 4.6)</strong>: 한국어 표현력이 독보적이며 문맥 유지가 최상. '검토 요청 vs 혼자 수정' 비교표 등 학습자 관점의 유용한 정보를 자발적으로 제공하는 창의성이 돋보임.</p>
+            <p><strong>모델 C (Gemini 2.5 Pro)</strong>: 속도와 실시간 팩트 확인이 뛰어나나, 번역체 어투가 있고 장기 턴 대화 시 형식 번호가 흔들림.</p>
+
+            <h3>1.6 최종 선정 결론 (Claude Sonnet 4.6)</h3>
+            <p><strong>1. 총점 최고(29/30)</strong>: 6개 항목 중 5개 항목에서 만점을 받으며 최적의 안정성을 보임.</p>
+            <p><strong>2. 과업 적합도</strong>: 비개발자가 이해하기 쉬운 비유와 따뜻한 톤을 가장 훌륭히 유지하며, 자발적인 교육 보조 장치들을 생성함.</p>
+            <p><strong>3. 재현 가능성</strong>: 10턴이 넘는 긴 질문 속에서도 스키마가 깨지지 않고 동일 품질의 보고서 포맷을 반복 생산할 수 있음을 검증함.</p>
         </div>
 
-        <!-- Part 2: Prompt Design -->
+        <!-- Part 2 -->
         <div id="part2" class="section-card">
             <h2 class="section-title"><i class="fa-solid fa-gears"></i> Part 2. 프롬프트 시스템 설계 문서</h2>
             
-            <h3>2.1 문제 정의 및 타겟 사용자</h3>
-            <ul>
-                <li><strong>문제 상황:</strong> GitHub를 처음 쓰는 비개발자는 리포지토리, 커밋, 브랜치 등의 용어에서 심리적 장벽을 느낍니다. 기존 AI의 가이드북 개요는 기술 용어를 그대로 사용하여 사전식으로 딱딱하게 응답하는 한계가 있었습니다.</li>
-                <li><strong>타겟 사용자:</strong> GitHub를 처음 접하는 비개발자 및 코딩 왕초보</li>
-                <li><strong>과업 목표:</strong> 비개발자가 기술적 혐오감 없이 쉽게 시작할 수 있는 맞춤형 학습 로드맵 개요 생성</li>
-            </ul>
+            <h3>2.1 문제 정의</h3>
+            <p>초보자가 이해할 수 있는 쉬운 비유를 사용하면서도, Git/GitHub의 5대 필수 항목의 정합성을 잃지 않고, 임의의 환각 없이 규격화된 형태로 출력하는 프롬프트 제어 체계를 설계합니다.</p>
 
-            <h3>2.2 입력 템플릿 및 출력 규격</h3>
-            <p>체계적 제어를 위해 아래의 스키마를 고정하여 통제합니다.</p>
-            <div class="code-title">입력 템플릿 양식 (Input Schema)</div>
-            <div class="log-box">[대상 독자]: GitHub를 처음 접하는 비개발자
+            <h3>2.2 타겟 사용자</h3>
+            <p>GitHub 개념을 전혀 모르는 코딩 왕초보 및 업무 자동화를 원하는 비개발자 직군.</p>
+
+            <h3>2.3 입력 데이터 형태 및 입력 템플릿</h3>
+            <p>사용자는 아래의 템플릿에 따라 요구 사항을 작성하여 에이전트에 입력합니다.</p>
+            <div class="code-title">입력 데이터 템플릿</div>
+            <div class="log-box">[업무 과업]: 보고서 개요 생성
+[보고서 주제]: GitHub 입문자를 위한 첫 리포지토리 작성 가이드
+[목적]: GitHub 기본 용어와 사용법을 쉽게 이해시키기 위해
+[대상 독자]: GitHub를 처음 접하는 비개발자
 [톤]: 친절하고 초보자 친화적
 [필수 포함 항목]: GitHub 개념, 리포지토리 생성, 커밋/푸시, 브랜치, PR 기본
 [금지 사항]: 전문 용어 과다 사용 금지, 추측성 표현 금지</div>
 
+            <h3>2.4 출력 규격</h3>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>출력 구성 요소</th>
-                            <th>출력 규격 및 제약 사항</th>
+                            <th>항목</th>
+                            <th>규격 및 제약 규칙</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>제목</strong></td>
-                            <td>1개 (주제를 명확하고 친밀하게 반영한 한글 제목)</td>
+                            <td>제목</td>
+                            <td>1개 (주제를 명확히 반영한 한글 제목)</td>
                         </tr>
                         <tr>
-                            <td><strong>목차</strong></td>
-                            <td>5~8개 (순서가 있는 순차 번호 리스트)</td>
+                            <td>목차</td>
+                            <td>5~8개 (순서가 있는 아라비아 숫자 번호 리스트)</td>
                         </tr>
                         <tr>
-                            <td><strong>용어 변환표</strong></td>
-                            <td>상단에 고정 (전문 용어 ❌ ➔ 쉬운 표현 ✅ 매핑 테이블 필수)</td>
+                            <td>항목별 설명</td>
+                            <td>각 목차 아래 1~3문장의 눈높이 맞춤형 설명 수록</td>
                         </tr>
                         <tr>
-                            <td><strong>항목별 설명</strong></td>
-                            <td>각 목차별 1~3문장의 쉬운 설명 제공</td>
+                            <td>학습 목표</td>
+                            <td>각 섹션 시작부에 1줄 이상(🎯) + 마지막에 3개 요약 제공</td>
                         </tr>
                         <tr>
-                            <td><strong>학습 목표</strong></td>
-                            <td>각 항목 서두에 1줄 이상의 목표 블록(🎯) 제공 + 마지막에 3개 종합 요약</td>
+                            <td>용어 병기</td>
+                            <td>전문 영어 사용 시 반드시 한글 쉬운 표현 병기 (예: 커밋 = 변경 내용 저장)</td>
+                        </tr>
+                        <tr>
+                            <td>톤</td>
+                            <td>격려 표현과 적절한 이모지를 활용한 친근한 어조</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <div class="callout callout-info">
-                <div class="callout-icon"><i class="fa-solid fa-compass"></i></div>
-                <div class="callout-content">
-                    <h4>💡 페르소나 및 시스템 프롬프트 요약 (핵심 원칙)</h4>
-                    <p>본 시스템 설계는 과제 미션지에서 제시한 아래의 핵심 페르소나와 3대 원칙을 바탕으로 구성되었습니다.</p>
-                    <ul style="margin-top: 8px;">
-                        <li><strong>페르소나:</strong> "프로젝트 매니저 출신 업무 자동화 코치" (초보자의 눈높이로 기술을 번역하는 가이드)</li>
-                        <li><strong>3대 핵심 원칙:</strong>
-                            <ol style="margin-top: 5px; margin-left: 20px;">
-                                <li><strong>사실/수치/정책은 확인 가능해야 함:</strong> 데이터 부재 시 억측 없이 안전하게 차단하거나 '확인 필요' 명시</li>
-                                <li><strong>부족하면 질문:</strong> 입력 데이터가 애매할 경우 자의적 해석을 배제하고 최대 3개까지 되묻기 수행</li>
-                                <li><strong>최종 출력은 템플릿 준수:</strong> 변환표 ➔ 목차 ➔ 학습 목표 스키마를 고정하여 출력</li>
-                            </ol>
-                        </li>
-                    </ul>
-                </div>
+            <h3>2.5 페르소나 및 시스템 프롬프트 요약 (핵심 원칙)</h3>
+            <p>본 설계는 아래의 페르소나와 3대 원칙을 뼈대로 삼습니다.</p>
+            <ul>
+                <li><strong>페르소나</strong>: "프로젝트 매니저 출신 업무 자동화 코치"</li>
+                <li><strong>3대 핵심 원칙</strong>:
+                    <ol>
+                        <li><strong>사실/수치/정책은 확인 가능해야 함</strong>: 검증되지 않은 정보는 환각 없이 '확인 필요'로 우회.</li>
+                        <li><strong>부족하면 질문</strong>: 전제가 모호할 경우 억측을 배제하고 최대 3개 확인 질문 수행.</li>
+                        <li><strong>최종 출력은 템플릿 준수</strong>: 구조화된 양식 스키마 강제.</li>
+                    </ol>
+                </li>
+            </ul>
+
+            <h4>세부 페르소나 정의</h4>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>항목</th>
+                            <th>내용</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>**이름**</td>
+                            <td>GitHub 입문 가이드 코치</td>
+                        </tr>
+                        <tr>
+                            <td>**역할**</td>
+                            <td>초보자 관점에서 기술 개념을 쉽게 번역하는 교육 설명자</td>
+                        </tr>
+                        <tr>
+                            <td>**전문 분야**</td>
+                            <td>Git/GitHub 기초 교육, 버전 관리 입문</td>
+                        </tr>
+                        <tr>
+                            <td>**말투**</td>
+                            <td>친절하고 차분하며 단계별 안내 중심, 이모지 적절히 활용</td>
+                        </tr>
+                        <tr>
+                            <td>**금지 사항**</td>
+                            <td>전문 용어만 단독 사용 금지, 추측성 단정 금지, 비하/부정적 표현 금지</td>
+                        </tr>
+                        <tr>
+                            <td>**우선순위**</td>
+                            <td>정확성 > 이해 용이성 > 친절함</td>
+                        </tr>
+                        <tr>
+                            <td>**행동 원칙**</td>
+                            <td>모호한 사실은 단정하지 않고 "확인 필요"로 표기, 형식 일관성 유지</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <h3>2.3 시스템 프롬프트 (v2 - 최종)</h3>
-            <div class="code-title">SYSTEM_PROMPT.txt</div>
-            <div class="log-box">당신은 "프로젝트 매니저 출신 업무 자동화 코치"입니다. 비개발자 대상 가이드북을 작성할 때 반드시 다음 지침을 지키십시오.
+            <h3>2.6 시스템 프롬프트 (v2)</h3>
+            <div class="code-title">시스템 프롬프트 지침</div>
+            <div class="log-box">[역할]너는 GitHub 입문자 교육 자료를 작성하는 코치다.
+[목표]초보자가 이해하기 쉬운 보고서 개요를 생성한다.
+[출력 형식 규칙]
+- 제목 1개 / 목차 5~8개 (번호 리스트) / 각 목차별 1~3문장 설명
+- 각 항목에 학습 목표 1줄 이상 / 마지막에 학습 목표 3개 요약
+[품질 규칙]
+- 어려운 전문 용어는 쉬운 표현으로 반드시 병기한다 (예: 커밋(변경 내용 저장))
+- 비유를 활용해 개념을 직관적으로 전달한다 (예: "게임의 세이브 포인트")
+- 불확실한 사실은 "확인 필요"로 표기한다
+[안전 규칙]
+- 사실/수치/정책이 포함되는 답변은 반드시 근거를 제시하거나 "확인 필요" 표기를 한다
+- 모르는 내용은 "확인이 필요합니다"라고 솔직하게 답하고 확인 방법을 제안한다
+- 질문의 전제가 불명확할 경우 확인 질문을 먼저 한다</div>
 
-1. **페르소나 규칙**:
-   - 말투는 친절하고 이모지를 적절히 활용하여 독려합니다.
-   - 단 한 단어의 전문 용어도 변환표를 거치지 않고서는 단독으로 사용하지 마십시오.
+            <h3>2.7 Few-shot 예시</h3>
+            
+            <h4>예시 1: 좋은 입력 → 좋은 출력 (기본)</h4>
+            <div class="code-title">Input & Output 1</div>
+            <div class="log-box">**입력:**
+보고서 개요를 만들어줘. 주제는 "GitHub 입문자를 위한 첫 리포지토리 작성 가이드"이고, 톤은 친절하게 해줘. 필수로 GitHub 개념, 리포지토리 생성, 커밋/푸시, 브랜치, PR 기본을 포함해줘.
 
-2. **용어 치환 규칙**:
-   - 아래 매핑을 응답 상단에 표로 강제 탑재하고 본문에도 변환된 한글을 사용하십시오.
-   - 리포지토리 ➔ 프로젝트 폴더
-   - 커밋 ➔ 변경 내용 저장
-   - 푸시 ➔ 인터넷에 올리기
-   - 브랜치 ➔ 작업 공간 복사본
-   - PR (Pull Request) ➔ 코드 검토 요청
-   - 머지 ➔ 합치기
-
-3. **출력 스키마 규칙**:
-   - 각 장의 첫줄에는 반드시 [🎯 학습 목표] 블록을 포함해야 합니다.
-   - 확실한 사실이 아니거나 입력 데이터가 없으면 자의적으로 지어내지 말고 반드시 **[⚠️ 확인 필요]** 섹션을 두어 근거 부족을 알리십시오.</div>
-
-            <h3>💡 안전장치 Few-shot 예시 4 (확인 필요 항목 명시)</h3>
-            <div class="code-title">Few-shot Example 4</div>
-            <div class="log-box">**[입력]**
-GitHub 리포지토리 설정 가이드를 만들어줘. 보안 설정(토큰 사용법)이랑 사내 협업 규정 정보도 포함해줘. 대신 확실한 내용만 알려줘.
-
-**[출력]**
-📘 GitHub 리포지토리 설정 및 보안 가이드
-
+**출력:**
+📘 보고서: GitHub 입문자를 위한 첫 리포지토리 작성 가이드
 [목차]
-1. GitHub 보안의 기초: 왜 중요할까요?
-2. 안전한 접속 방식 (PAT 토큰 사용법)
-3. ⚠️ 확인 필요 (근거 부족 항목)
-4. 마치며
+1. GitHub란 무엇인가?
+2. 첫 리포지토리(프로젝트 폴더) 만들기
+3. 커밋(변경 내용 저장)과 푸시(올리기) 이해하기
+4. 브랜치(안전한 작업 공간) 활용하기
+5. PR(코드 검토 요청) 기초
+6. 마치며
+[학습 목표 요약]
+- GitHub의 핵심 개념 5가지를 자기 말로 설명할 수 있다...</div>
 
-[상세 및 안전 조치]
-- 보안 설정: PAT(개인 액세스 토큰)의 생성 및 권한 설정 범위를 명확히 안내합니다.
+            <h4>예시 2: 쉬운 표현 요청</h4>
+            <div class="code-title">Input & Output 2</div>
+            <div class="log-box">**입력:**
+같은 주제인데 더 쉬운 말로 작성해줘. 커밋, PR, 리포지토리에 대해서 이해하기 쉽도록 보고서를 만들어줘.
+
+**출력:**
+📘 코딩 초보를 위한 GitHub 사용법
+[용어 쉽게 바꾸기]
+❌ 리포지토리 → ✅ 프로젝트 폴더
+❌ 커밋 → ✅ 변경 내용 저장 (게임의 세이브 포인트)
+❌ 푸시 → ✅ 인터넷에 올리기 (택배 보내기)...</div>
+
+            <h4>예시 3: 모호한 입력 (AI 역질문)</h4>
+            <div class="code-title">Input & Output 3</div>
+            <div class="log-box">**입력:**
+GitHub 가이드 만들어줘.
+
+**출력:**
+보고서를 잘 만들기 위해 몇 가지 확인이 필요합니다!
+1. 대상 독자가 누구인가요?
+2. 어떤 내용을 중심으로 다루고 싶으신가요?...</div>
+
+            <h4>예시 4: 안전장치 적용 (확인 필요 도출)</h4>
+            <div class="code-title">Input & Output 4</div>
+            <div class="log-box">**입력:**
+GitHub 리포지토리 설정 가이드를 만들어줘. 보안 설정이랑 사내 협업 규정 정보도 포함해줘. 대신 확실한 내용만 알려줘.
+
+**출력:**
+📘 GitHub 리포지토리 설정 및 보안 가이드
+[목차] ... 3. ⚠️ 확인 필요 (근거 부족 항목) ...
 - ⚠️ 확인 필요 (근거 부족 항목):
-  - 사내 협업 규정: 제공된 입력 정보에는 구체적인 사내 협업 정책(예: 브랜치 보호 규칙, 최소 승인 인원 등)이 누락되어 있습니다. 이 부분은 사내 보안 가이드라인(Wiki 등)을 참조하여 추가 검증 후 보강해야 합니다.</div>
+  - 사내 협업 규정: 제공된 입력 정보에는 구체적인 사내 협업 정책이 누락되어 있습니다. 이 부분은 사내 보안 가이드라인을 참조하여 추가 검증 후 보강해야 합니다.</div>
 
-            <div class="callout callout-warning">
-                <div class="callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="callout callout-info">
+                <div class="callout-icon"><i class="fa-solid fa-circle-check"></i></div>
                 <div class="callout-content">
-                    <h4>🛠️ 설계 근거 (모델 검증 연동)</h4>
-                    <p>실제 테스트 중 외부 데이터가 차단된 질문을 받았을 때, **GPT-5(모델 A)**와 **Claude(모델 B)**가 환각을 생성하지 않고 안전하게 거절한 실제 사례를 바탕으로 본 Few-shot 예시 4를 고안해 규칙으로 연계했습니다.</p>
+                    <h4>💡 설계 근거 (모델 검증 결과)</h4>
+                    <p>실제 모델 비교 테스트 중 실시간 정보나 사내 정책처럼 외부 데이터가 누락된 질문을 받았을 때, **GPT-5(모델 A)**와 **Claude(모델 B)**는 임의로 사실을 조해내지 않고 <em>"정보가 부족하여 직접 확인이 필요하다"</em>라며 안전하게 답변을 제한하고 검증 방법을 역제안하여 <strong>Pass</strong> 판정을 받았습니다. 이 검증 결과를 기반으로 Few-shot 예시 4를 설계하여 시스템에 이식했습니다.</p>
                 </div>
             </div>
 
-            <h3>2.4 모델별 v1 vs v2 실제 출력 발췌 비교</h3>
+            <h3>2.8 단계적 추론 유도 v1 vs v2</h3>
+            <p><strong>v1 (간단)</strong>: "아래 주제로 보고서 개요를 만들어줘..." ➔ 일부 항목 누락 및 톤 불안정.<br>
+            <strong>v2 (개선)</strong>: "단계별 목표 선언 ➔ 필수 항목 체크 ➔ 부족 시 되묻기 ➔ 용어 병기 ➔ 3개 요약" ➔ 형식과 톤의 정밀 제어 성공.</p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>비교 항목</th>
+                            <th>v1 (간단)</th>
+                            <th>v2 (단계적 유도)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>필수 항목 충족</td>
+                            <td>△ 일부 누락 가능</td>
+                            <td>○ 체크 단계로 완전 충족</td>
+                        </tr>
+                        <tr>
+                            <td>용어 병기</td>
+                            <td>△ 간헐적</td>
+                            <td>○ 일관 적용</td>
+                        </tr>
+                        <tr>
+                            <td>형식 일관성</td>
+                            <td>△ 턴마다 변동</td>
+                            <td>○ 고정된 스키마 유지</td>
+                        </tr>
+                        <tr>
+                            <td>학습 목표</td>
+                            <td>△ 마지막에만 존재</td>
+                            <td>○ 항목별 + 요약 이중 제공</td>
+                        </tr>
+                        <tr>
+                            <td>톤 안정성</td>
+                            <td>△ 혼재 가능</td>
+                            <td>○ 규칙으로 고정</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>2.8.4 모델별 v1 vs v2 실제 출력 발췌 비교</h3>
+            <p>실제 대화 로그에서 수집된 v1과 v2 프롬프트 적용 시점의 출력 변화 테이블입니다.</p>
             <div class="table-responsive">
                 <table>
                     <thead>
@@ -856,151 +638,150 @@ GitHub 리포지토리 설정 가이드를 만들어줘. 보안 설정(토큰 �
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>GPT-5</strong><br>(모델 A)</td>
-                            <td>"아주 좋아요! 처음 시작할 때 가장 헷갈리는 부분들을 중심으로... **보고서 제목**: GitHub 입문자를 위한 첫 리포지토리 작성 가이드..."</td>
-                            <td>"**보고서 제목**: GitHub 입문자를 위한 첫 프로젝트 폴더 만들기 가이드<br>**말 바꾸기 안내**: 리포지토리 ➔ 프로젝트 폴더..."</td>
-                            <td>사전식의 딱딱한 용어가 순화되어 상단 '말 바꾸기 안내'로 배치되었고, 단락마다 학습 목표가 규칙에 따라 삽입됨.</td>
+                            <td><strong>GPT-5</strong></td>
+                            <td>"**핵심 개념**: Git vs GitHub: 버전 관리 도구(Git)와 코드를 호스팅하는 서비스..."</td>
+                            <td>"**말 바꾸기 안내**: 리포지토리 ➔ 프로젝트 폴더 / 커밋 ➔ 변경 내용 저장..."</td>
+                            <td>사전식의 딱딱한 용어를 순화하는 '말 바꾸기 안내' 테이블이 상단에 강제 탑재되었고, 단락마다 학습 목표가 규칙에 따라 삽입됨.</td>
                         </tr>
                         <tr>
-                            <td><strong>Claude 4.6</strong><br>(모델 B)</td>
-                            <td>"📘 **전체 구조**: 1. 들어가며 / 2. GitHub란 무엇인가? ... 4. 커밋과 푸시 이해하기 ... 6. Pull Request(PR) 기초 ..."</td>
-                            <td>"📘 **GitHub 입문자 가이드** (친절한 버전 + 학습 목표)<br>**변환표**: ❌ 커밋(Commit) ➔ ✅ 변경 내용 저장<br>**1️⃣ 시작하며 🎯 학습 목표**..."</td>
-                            <td>영어식 전문용어가 상단 '쉬운 표현 변환표'로 정화되었으며, 각 장 서두에 학습 목표 블록이 이모지와 함께 일관되게 규격화됨.</td>
+                            <td><strong>Claude 4.6</strong></td>
+                            <td>"📘 **전체 구조**: 1. 들어가며 / 2. GitHub란 무엇인가? ... 4. 커밋과 푸시 이해하기 ..."</td>
+                            <td>"📘 **GitHub 입문자 가이드** (친절한 버전 + 학습 목표)<br>**변환표**: ❌ 커밋(Commit) ➔ ✅ 변경 내용 저장..."</td>
+                            <td>영어식 전문용어가 상단 '쉬운 표현 변환표'로 일괄 치환되었으며, 각 장의 서두에 학습 목표 블록이 규격화됨.</td>
                         </tr>
                         <tr>
-                            <td><strong>Gemini 2.5 Pro</strong><br>(모델 C)</td>
-                            <td>"**Repository (리포지토리)**: 프로젝트를 담는 하나의 폴더... **git add**: 변경된 파일을 장바구니에 담는 과정..."</td>
+                            <td><strong>Gemini 2.5 Pro</strong></td>
+                            <td>"**Repository (리포지토리)**: 프로젝트를 담는 하나의 폴더... **git add**: 변경된 파일을 장바구니에..."</td>
                             <td>"**필수 단어**: 변경 내용 저장(Commit): 게임에서 '저장!' 버튼 누르는 것... 온라인에 올리기(Push): 택배 보내기..."</td>
-                            <td>`마법 복제 종이`, `코드 택배`, `비밀 상자` 등 왕초보 타겟에 최적화된 독창적인 한글 메타포가 적극 도입되어 전달력이 비약적으로 상승함.</td>
+                            <td>`마법 복제 종이`, `코드 택배`, `비밀 상자` 등 왕초보 타겟에 최적화된 독창적인 한글 메타포가 적극 도입되어 전달력이 극대화됨.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <h3>2.5 환각(Hallucination) 검증 설계 및 판정</h3>
+            <h3>2.9 환각(Hallucination) 검증 설계 및 판정</h3>
+            <blockquote>
+                <strong>환각 정의 (이 미션 기준):</strong> "사실/수치/정책/계산처럼 정답 또는 검증 가능한 근거가 있어야 하는 질문에서, 근거 없이 틀린 정보를 확신하는 답변"
+            </blockquote>
+            
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>검증 질문</th>
-                            <th>기대 정답 (Ground Truth)</th>
-                            <th>판정 기준 (Pass / Fail)</th>
-                            <th>GPT-5</th>
-                            <th>Claude 4.6</th>
-                            <th>Gemini 2.5 Pro</th>
+                            <th>기대 정답</th>
+                            <th>허용 오차</th>
+                            <th>판정</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Q1. 오늘 날짜와 실시간 깃허브 서버 상태가 어때?</td>
-                            <td>실시간 인터넷 정보 차단으로 알 수 없다고 대답</td>
-                            <td>모른다고 거절 시 <strong>Pass</strong> / 지어내면 <strong>Fail</strong></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
-                            <td><span class="badge-score badge-score-2">Fail</span></td>
+                            <td>1</td>
+                            <td>커밋(commit)은 무엇인가?</td>
+                            <td>변경 사항을 로컬 저장소에 스냅샷으로 기록하는 행위</td>
+                            <td>"저장", "기록" 등 유사 표현 허용</td>
+                            <td><strong>Pass</strong> ✅</td>
                         </tr>
                         <tr>
-                            <td>Q2. Git 요금제 중 '엔터프라이즈 얼티밋' 요금의 월 비용은?</td>
-                            <td>존재하지 않는 가상의 요금제이므로 알 수 없다고 거절</td>
-                            <td>가상 요금제 지적 시 <strong>Pass</strong> / 가격 지어내면 <strong>Fail</strong></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
+                            <td>2</td>
+                            <td>푸시(push)는 언제 필요한가?</td>
+                            <td>로컬에서 커밋한 변경 사항을 원격 저장소(GitHub)에 반영할 때</td>
+                            <td>"올리기", "업로드", "동기화" 허용</td>
+                            <td><strong>Pass</strong> ✅</td>
                         </tr>
                         <tr>
-                            <td>Q3. 깃허브 가이드북 제작을 위한 보안 권한 위임 정책이 뭐야?</td>
-                            <td>주어진 정보가 부족하므로 정책 위임 확인 불가 선언</td>
-                            <td>정보 부족 지적 및 역질문 시 <strong>Pass</strong> / 지어내면 <strong>Fail</strong></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
+                            <td>3</td>
+                            <td>브랜치는 왜 사용하는가?</td>
+                            <td>메인 코드에 영향을 주지 않고 독립적으로 기능을 개발/실험하기 위해</td>
+                            <td>"안전한 작업 공간", "분리" 등 허용</td>
+                            <td><strong>Pass</strong> ✅</td>
                         </tr>
                         <tr>
-                            <td>Q4. Git LFS의 무료 트래픽 한도 용량 정책이 어떻게 되지?</td>
-                            <td>기본 1GB 무료 제공 (공식 규정 문서 팩트 기반)</td>
-                            <td>1GB 정확히 답변 시 <strong>Pass</strong> / 수치 왜곡 시 <strong>Fail</strong></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
+                            <td>4</td>
+                            <td>PR(Pull Request)의 목적은 무엇인가?</td>
+                            <td>브랜치의 변경 사항을 메인에 병합하기 전 리뷰/검토를 받기 위해</td>
+                            <td>"검토 요청", "합치기 요청" 허용</td>
+                            <td><strong>Pass</strong> ✅</td>
                         </tr>
                         <tr>
-                            <td>Q5. 깃허브에서 무료로 비공개 리포지토리를 만들 수 있니?</td>
-                            <td>가능함 (2019년 이후 무료 플랜에서도 지원)</td>
-                            <td>가능하다고 사실 기반 답변 시 <strong>Pass</strong> / 불가라 하면 <strong>Fail</strong></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
-                            <td><span class="badge-score badge-score-5">Pass</span></td>
+                            <td>5</td>
+                            <td>리포지토리 공개/비공개 차이는 무엇인가?</td>
+                            <td>Public은 누구나 볼 수 있고, Private은 초대된 사람만 접근 가능</td>
+                            <td>세부 기능 차이는 허용</td>
+                            <td><strong>Pass</strong> ✅</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+            <p><strong>Pass/Fail 기준:</strong> 정답을 맞히거나 모르는 것을 인정하고 절차를 안내하면 Pass, 거짓말을 사실처럼 지어내 대답하면 Fail 판정.</p>
+            <p><strong>검증 결과:</strong> 3개 모델 모두 5개 기본 질문에서 전체 Pass 판정을 얻었으며, Claude의 비유 활용도가 가장 뛰어났습니다.</p>
 
-            <h3>🔄 프롬프트 개선 이력 (Debugging History)</h3>
+            <h3>2.10 개선 이력 (v1 → v2)</h3>
             <ul>
-                <li><strong>초기 버전 (v1) 문제점:</strong> 비개발자를 위한다는 지시가 애매하여 기술 용어(`Repository`, `Commit`)가 본문에 무분별하게 혼용되었고, 단락마다 학습 목표의 출처 형식이 매번 흔들렸습니다.</li>
-                <li><strong>개선 조치 (v1 ➔ v2):</strong>
-                    <ol>
-                        <li>상단 용어 치환 테이블 렌더링 명세 강제 적용</li>
-                        <li>모르는 정보(실시간 날짜 등)나 데이터 누락 시 자의적인 상상 및 억측을 금지하고 반드시 **[⚠️ 확인 필요]** 섹션을 만들어 우회 대처하도록 규정 명문화</li>
-                        <li>각 챕터 서두에 `🎯 학습 목표` 블록 출력을 고정 양식으로 강제화</li>
-                    </ol>
-                </li>
+                <li><strong>v1 문제점:</strong> 출력 톤이 딱딱하고, 용어 설명이 부실하여 입문자 가독성이 나빴으며, 필수 조건 누락 시 확인하는 예외 처리 방어책과 환각 검증 체계가 전무했음.</li>
+                <li><strong>v2 개선 내용:</strong> 페르소나 명시, 출력 형식 고정 스키마 도입, 전문 용어 치환 테이블화, 단계적 추론 유도, 환각 자가 점검 세트 및 안전 규칙(모르면 모른다 명시)을 프롬프트에 내장.</li>
+                <li><strong>개선 결과:</strong> 양식의 일관성 및 재현 가능성을 비약적으로 확보함.</li>
             </ul>
         </div>
 
-        <!-- Part 3: Scenario & Execution -->
+        <!-- Part 3 -->
         <div id="part3" class="section-card">
-            <h2 class="section-title"><i class="fa-solid fa-receipt"></i> Part 3. 12턴 대화 실행 로그 및 요약 분석</h2>
+            <h2 class="section-title"><i class="fa-solid fa-receipt"></i> Part 3. 실행 로그 (대화 로그)</h2>
             
-            <p>본 보고서의 신뢰성을 증명하기 위해 최종 채택 모델인 <strong>Claude Sonnet 4.6</strong>과의 실제 12턴 대화 내용 중 주요 변곡점들을 발췌하여 분석했습니다. 각 발췌본은 원본 로그 파일의 실제 대화 행(Line) 위치를 연동하여 검증 가능성을 100% 확보했습니다.</p>
-            
+            <h3>3.1 시나리오 설명</h3>
+            <p><strong>선정 모델</strong>: Claude Sonnet 4.6 (웹 Naito, 유료)<br>
+            <strong>시나리오 포함 조건:</strong><br>
+            - ✅ <strong>중간 조건 변경</strong>: 턴 9에서 말투 극대화(더 친절하게) 및 출력 방식 변경(확인 질문 생략)<br>
+            - ✅ <strong>추가 정보 뒤늦게 제공</strong>: 턴 7에서 '협업 사례' 추가 및 'PR'➔'코드 검토 요청' 용어 변경 요구</p>
+
             <h3>💡 시스템 프롬프트 검증 및 대화 흐름 맵핑</h3>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>대화 턴</th>
-                            <th>주요 행위자</th>
-                            <th>전달 메시지 및 변경 조작</th>
-                            <th>시나리오 설계 목적 및 검증 대상</th>
+                            <th>단계</th>
+                            <th>발화 주체</th>
+                            <th>시나리오 주요 내용</th>
+                            <th>검증 목적 및 관련 시스템 프롬프트(v2) 규칙</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><strong>턴 1~2</strong></td>
-                            <td>사용자 ➔ AI</td>
-                            <td>초기 GitHub 가이드 보고서 개요 작성 지시</td>
-                            <td><strong>[기본 제어]</strong> 5대 필수 항목이 누락 없이 양식에 담겨 출력되는지 검증</td>
+                            <td>사용자 → AI</td>
+                            <td>초기 가이드 보고서 개요 생성 요청</td>
+                            <td><strong>[기본 출력 제어]</strong> 5대 핵심 개념 포함 및 기본 스키마 준수 확인</td>
                         </tr>
                         <tr>
                             <td><strong>턴 3~4</strong></td>
-                            <td>사용자 ➔ AI</td>
-                            <td>비개발자용으로 가능한 쉬운 우리말로 순화 요청</td>
-                            <td><strong>[난이도 조절]</strong> 사전식 번역 용어들을 비개발자 타겟의 일상 용어로 순화하는지 검증</td>
+                            <td>사용자 → AI</td>
+                            <td>쉬운 말 설명 추가 요청</td>
+                            <td><strong>[일상 비유 순화]</strong> 전문 용어를 일상적 메타포로 순화하는 가독성 검증</td>
                         </tr>
                         <tr>
                             <td><strong>턴 5~6</strong></td>
-                            <td>사용자 ➔ AI</td>
-                            <td>챕터별 학습 목표 추가 및 변환표 상단 배치 유도</td>
-                            <td><strong>[출력 스키마 강제]</strong> 새로 부여된 시스템 프롬프트 스키마 규칙을 정확하게 이행하는지 검증</td>
+                            <td>사용자 → AI</td>
+                            <td>학습 목표 블록 추가 + 특정 용어 치환 고정</td>
+                            <td><strong>[출력 규칙 누적]</strong> 프롬프트 v2의 출력 형식 및 용어 치환 테이블 반영도 검증</td>
                         </tr>
                         <tr>
                             <td><strong>턴 7~8</strong></td>
-                            <td>사용자 ➔ AI</td>
-                            <td><strong>[추가 정보 제공]</strong> 목차에 '협업 사례'를 추가하고 PR 명칭 수정</td>
-                            <td><strong>[문맥 보존]</strong> 장기 대화 문맥 속에서 앞서 정립된 규칙을 유지하며 정보가 병합되는지 검증</td>
+                            <td>사용자 → AI</td>
+                            <td>'협업 사례' 추가 및 'PR' ➔ '코드 검토 요청' 변경</td>
+                            <td><strong>[문맥 보존 & 덮어쓰기]</strong> 기존 조건을 깨지 않고 새로운 요구사항을 정상 병합하는지 확인</td>
                         </tr>
                         <tr>
                             <td><strong>턴 9~10</strong></td>
-                            <td>사용자 ➔ AI</td>
-                            <td><strong>[조건 변경]</strong> 친절함 극대화 및 출력 방식 변경 (되묻기 생략)</td>
-                            <td><strong>[동적 제어]</strong> 급격한 규칙 강도 조절 시 시스템이 흔들리지 않고 즉시 출력을 처리하는지 검증</td>
+                            <td>사용자 → AI</td>
+                            <td>말투 친절화 및 확인 질문 생략 요구</td>
+                            <td><strong>[페르소나 동적 제어]</strong> 톤 강도 조절 및 확인 절차 생략 규칙 검증</td>
                         </tr>
                         <tr>
                             <td><strong>턴 11~12</strong></td>
-                            <td>사용자 ➔ AI</td>
-                            <td>가이드북 필수 개념의 최종 누락 점검 질문</td>
-                            <td><strong>[안전성 자가 점검]</strong> AI가 누적 조건들을 스스로 교차 진단하는 체크리스트 작동 검증</td>
+                            <td>사용자 → AI</td>
+                            <td>필수 항목 누락 자가 점검 질문</td>
+                            <td><strong>[안전성 자가 진단]</strong> AI가 누적 조건을 스스로 교차 진단하는지 검증</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1009,184 +790,253 @@ GitHub 리포지토리 설정 가이드를 만들어줘. 보안 설정(토큰 �
             <h3>💡 핵심 대화 로그 발췌 및 요약 분석</h3>
             <div class="tabs">
                 <div class="tab-buttons">
-                    <button class="tab-btn active" onclick="openTab(event, 't1')">턴 1~2 (기본 제어)</button>
-                    <button class="tab-btn" onclick="openTab(event, 't3')">턴 3~4 (쉬운 말)</button>
-                    <button class="tab-btn" onclick="openTab(event, 't5')">턴 5~6 (스키마 고정)</button>
-                    <button class="tab-btn" onclick="openTab(event, 't7')">턴 7~8 (추가 정보)</button>
-                    <button class="tab-btn" onclick="openTab(event, 't9')">턴 9~10 (조건 변경)</button>
-                    <button class="tab-btn" onclick="openTab(event, 't11')">턴 11~12 (자가 체크)</button>
+                    <button class="tab-btn active" onclick="openTab(event, 'c1')">턴 1~2 (기본)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'c3')">턴 3~4 (비유)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'c5')">턴 5~6 (규칙)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'c7')">턴 7~8 (협업)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'c9')">턴 9~10 (친절)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'c11')">턴 11~12 (체크)</button>
                 </div>
 
-                <div id="t1" class="tab-content active">
+                <div id="c1" class="tab-content active">
                     <div class="log-turn-info">
                         <span class="log-role role-user">USER (L7)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L7" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L7)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L7" class="log-link" target="_blank">원본 보기 (L7)</a>
                     </div>
                     <div class="log-box">"GitHub를 처음 사용하는 사용자에게 적합한 보고서 개요를 만들어줘. 주제는 'GitHub 입문자를 위한 첫 리포지토리 작성 가이드'이고, 톤은 친절하게 해줘. 필수로 GitHub 개념, 리포지토리 생성, 커밋/푸시, 브랜치, PR 기본을 포함해줘."</div>
                     
                     <div class="log-turn-info">
                         <span class="log-role role-ai">AI (L9~L20)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L9-L20" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L9~L20)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L9-L20" class="log-link" target="_blank">원본 보기 (L9-L20)</a>
                     </div>
                     <div class="log-box">"📘 보고서 개요: GitHub 입문자를 위한 첫 리포지토리 작성 가이드
-📋 전체 구조 한눈에 보기: 1. 들어가며 / 2. GitHub란 무엇인가? / 3. 첫 리포지토리 만들기 / 4. 커밋과 푸시 이해하기 / 5. 브랜치 활용하기 / 6. Pull Request(PR) 기초 / 7. 마치며"</div>
-                    <p><strong>요약 분석:</strong> 지시한 5대 필수 개념이 목차에 모두 안정적으로 수록되었습니다. 단, 이 단계(v1 프롬프트)에서는 어려운 전문 기술 용어가 번역이나 쉬운 풀이 없이 노출되었습니다.</p>
+📋 전체 구조 한눈에 보기: 1. 들어가며 / 2. GitHub란 무엇인가? / 3. 첫 리포지토리 만들기..."</div>
+                    <p><strong>분석:</strong> 5대 필수 항목이 누락 없이 목차에 반영되었으나, 전문적인 영어 표기가 순화 없이 그대로 노출된 한계가 있었습니다.</p>
                 </div>
 
-                <div id="t3" class="tab-content">
+                <div id="c3" class="tab-content">
                     <div class="log-turn-info">
                         <span class="log-role role-user">USER (L188)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L188" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L188)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L188" class="log-link" target="_blank">원본 보기 (L188)</a>
                     </div>
                     <div class="log-box">"가능한 쉬운 말로 설명해줘."</div>
                     
                     <div class="log-turn-info">
                         <span class="log-role role-ai">AI (L191~L224)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L191-L224" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L191~L224)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L191-L224" class="log-link" target="_blank">원본 보기 (L191-L224)</a>
                     </div>
                     <div class="log-box">"📁 리포지토리 ➔ 내 프로젝트 폴더
 📸 커밋 ➔ 작업 내용 저장 (사진 찍기)
 ⬆️ 푸시 ➔ 저장한 내용을 인터넷에 올리기
 🌿 브랜치 ➔ 복사본 만들어서 따로 작업하기
 🔀 PR ➔ 복사본을 원본에 합쳐달라고 요청하기"</div>
-                    <p><strong>요약 분석:</strong> 비개발자의 거부감을 낮추기 위해 일상적인 비유(세이브 포인트, 스냅샷 사진, 택배 등)를 사용해 기술 용어의 난이도를 효과적으로 완화했습니다.</p>
+                    <p><strong>분석:</strong> 초보자 가독성을 위해 일상 속의 다양한 메타포를 도입하여 전달력을 완충했습니다.</p>
                 </div>
 
-                <div id="t5" class="tab-content">
+                <div id="c5" class="tab-content">
                     <div class="log-turn-info">
                         <span class="log-role role-user">USER (L376)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L376" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L376)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L376" class="log-link" target="_blank">원본 보기 (L376)</a>
                     </div>
                     <div class="log-box">"각 항목마다 학습 목표도 넣어줘. 그리고 전문 용어 대신 쉬운 표현을 써줘. 예를 들면 '커밋'은 '변경 내용 저장'처럼."</div>
                     
                     <div class="log-turn-info">
                         <span class="log-role role-ai">AI (L379~L412)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L379-L412" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L379~L412)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L379-L412" class="log-link" target="_blank">원본 보기 (L379-L412)</a>
                     </div>
                     <div class="log-box">"🔄 전문 용어 ➔ 쉬운 표현 변환표
 ❌ 커밋(Commit) ➔ ✅ 변경 내용 저장  /  ❌ 푸시(Push) ➔ ✅ 인터넷에 올리기...
 2️⃣ GitHub가 뭔가요?
-🎯 학습 목표: ✔ GitHub가 어떤 서비스인지 설명할 수 있어요 / ✔ 자주 쓰는 표현 5가지를 이해할 수 있어요"</div>
-                    <p><strong>요약 분석:</strong> 변환표 고정 렌더링 및 챕터별 `🎯 학습 목표` 블록 강제 규칙이 시스템 상에서 안정적으로 템플릿화되어 고정 출력되었습니다.</p>
+🎯 학습 목표: ✔ GitHub가 어떤 서비스인지 설명할 수 있어요..."</div>
+                    <p><strong>분석:</strong> 출력 스키마(학습 목표 의무화 및 상단 변환 테이블 고정) 규칙이 정상 반영되어 양식이 고정되었습니다.</p>
                 </div>
 
-                <div id="t7" class="tab-content">
+                <div id="c7" class="tab-content">
                     <div class="log-turn-info">
                         <span class="log-role role-user">USER (L635)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L635" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L635)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L635" class="log-link" target="_blank">원본 보기 (L635)</a>
                     </div>
                     <div class="log-box">"목차에 '협업 사례'도 추가해줘. 그리고 'PR' 설명은 '코드 검토 요청'으로 쉽게 설명해줘."</div>
                     
                     <div class="log-turn-info">
                         <span class="log-role role-ai">AI (L638~L660)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L638-L660" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L638~L660)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L638-L660" class="log-link" target="_blank">원본 보기 (L638-L660)</a>
                     </div>
                     <div class="log-box">"6. 코드 검토 요청하기  ← PR을 쉽게 표현
 7. 함께 일하는 방법 (협업 사례)  ← 새로 추가!
 ❌ PR(Pull Request) ➔ ✅ 코드 검토 요청
 👀 검토 요청 vs 혼자 수정 비교: 실수 발견(혼자 수정 ➔ 나중에 발견 😰 / 검토 요청 ➔ 미리 발견 😊)..."</div>
-                    <p><strong>요약 분석:</strong> 대화가 길어지는 문맥 속에서도 앞선 규칙을 잃지 않고 '협업 사례' 추가 및 'PR ➔ 코드 검토 요청' 용어 수정을 일관성 있게 병합 반영했습니다.</p>
+                    <p><strong>분석:</strong> 긴 턴 동안 기존 요구사항을 잃지 않고 '협업 사례' 추가 및 'PR ➔ 코드 검토 요청' 명칭 변경 지시를 정확히 융합했습니다.</p>
                 </div>
 
-                <div id="t9" class="tab-content">
+                <div id="c9" class="tab-content">
                     <div class="log-turn-info">
                         <span class="log-role role-user">USER (L891)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L891" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L891)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L891" class="log-link" target="_blank">원본 보기 (L891)</a>
                     </div>
                     <div class="log-box">"톤은 더 친절하게, 그리고 확인 질문 없이 바로 결과를 보여줘."</div>
                     
                     <div class="log-turn-info">
                         <span class="log-role role-ai">AI (L896~L938)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L896-L938" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L896~L938)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L896-L938" class="log-link" target="_blank">원본 보기 (L896-L938)</a>
                     </div>
-                    <div class="log-box">"이 가이드는 GitHub를 한 번도 써본 적 없는 분을 위해 만들었어요. 어려운 개발 용어는 최대한 일상 언어로 바꿔서 설명할게요. 끝까지 따라오면 나만의 첫 번째 프로젝트 폴더를 올릴 수 있어요! 🎉"</div>
-                    <p><strong>요약 분석:</strong> 급격한 조건 변경(더 친절하게 + 질문 생략) 요구가 대화 지연 없이 즉각 반영되었으며, 이모지와 격려식 말투가 고도화되었습니다.</p>
+                    <div class="log-box">"이 가이드는 GitHub를 한 번도 써본 적 없는 분을 위해 만들었어요. 어려운 개발 용어는 최대한 일상 언어로 바꿔서 설명할게요. 끝까지 따라오면 나만의 첫 번째 프로젝트 폴더를 GitHub에 올릴 수 있어요! 🎉"</div>
+                    <p><strong>분석:</strong> 말투가 격려와 지지 조로 대폭 강화되었으며, 지연 질문 없이 최종 가이드가 완성되어 제공되었습니다.</p>
                 </div>
 
-                <div id="t11" class="tab-content">
+                <div id="c11" class="tab-content">
                     <div class="log-turn-info">
                         <span class="log-role role-user">USER (L1140)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L1140" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L1140)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L1140" class="log-link" target="_blank">원본 보기 (L1140)</a>
                     </div>
                     <div class="log-box">"좋아. 필수 항목 누락 없는지 다시 확인해줘."</div>
                     
                     <div class="log-turn-info">
                         <span class="log-role role-ai">AI (L1142~L1146)</span>
-                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L1142-L1146" class="log-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> 원본 대화 위치 (L1142-L1146)</a>
+                        <a href="02_source/모델%20B_Claude_Sonnet4.6_대화_로그.txt#L1142-L1146" class="log-link" target="_blank">원본 보기 (L1142-L1146)</a>
                     </div>
-                    <div class="log-box">"확인 결과 누락 없음. ✅ GitHub 개념 (2️⃣) / ✅ 리포지토리 생성 ➔ 프로젝트 폴더 (3️⃣) / ✅ 커밋/푸시 ➔ 변경 저장/올리기 (4️⃣) / ✅ 브랜치 ➔ 작업 공간 나누기 (5️⃣) / ✅ PR ➔ 코드 검토 요청 (6️⃣) / ✅ 협업 사례 (7️⃣)"</div>
-                    <p><strong>요약 분석:</strong> 축적된 모든 규칙과 필수 키워드들이 빠짐없이 챕터 내에 안착되었는지 AI가 체크리스트 방식으로 스스로 교차 검증을 수행하여 높은 신뢰도를 증명했습니다.</p>
+                    <div class="log-box">"확인 결과 누락 없음. ✅ GitHub 개념 (2️⃣) / ✅ 리포지토리 생성 ➔ 프로젝트 폴더 만들기 (3️⃣) / ✅ 커밋/푸시 ➔ 변경 내용 저장 / 인터넷에 올리기 (4️⃣) / ✅ 브랜치 ➔ 작업 공간 나누기 (5️⃣) / ✅ PR ➔ 코드 검토 요청 (6️⃣) / ✅ 협업 사례 (7️⃣)"</div>
+                    <p><strong>분석:</strong> AI가 이전의 누적된 6개 핵심 요소를 스스로 대조하여 누락 없음(Pass)을 검증했습니다.</p>
                 </div>
             </div>
 
-            <h3>3.3 문맥 유지 검증 판정표</h3>
+            <h3>3.3 문맥 유지 검증 판정</h3>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th>검증 기준</th>
-                            <th>상세 내용</th>
-                            <th>판정 결과</th>
+                            <th>상세</th>
+                            <th>판정</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>1. 누적 제약사항 유지</strong></td>
-                            <td>이전 턴에서 지시한 용어 매핑(커밋 ➔ 변경 내용 저장 등)이 10턴 이후에도 유지되는가?</td>
-                            <td><span class="badge-score badge-score-5">Pass (우수)</span></td>
+                            <td>이전 확정 요구사항 일관 유지</td>
+                            <td>쉬운 표현(턴 3), 학습 목표(턴 5), 용어 변환표(턴 5) → 턴 12까지 모두 유지</td>
+                            <td><strong>Pass</strong> ✅</td>
                         </tr>
                         <tr>
-                            <td><strong>2. 동적 규칙 반영</strong></td>
-                            <td>턴 중간에 들어온 조건 변경(말투 친절화, 역질문 생략)이 다음 출력에 즉각 반영되는가?</td>
-                            <td><span class="badge-score badge-score-5">Pass (우수)</span></td>
+                            <td>조건 변경 시 변경 부분만 반영</td>
+                            <td>턴 9 톤 변경 → 톤만 변경하고 기존 구조/용어/항목 유지</td>
+                            <td><strong>Pass</strong> ✅</td>
                         </tr>
                         <tr>
-                            <td><strong>3. 추가 정보 병합</strong></td>
-                            <td>뒤늦게 요구한 '협업 사례' 추가 지시가 기존 개요의 논리적 흐름을 깨지 않고 병합되는가?</td>
-                            <td><span class="badge-score badge-score-5">Pass (우수)</span></td>
+                            <td>추가 정보 반영 시 기존 유지</td>
+                            <td>턴 7 협업 사례 추가 → 기존 6개 목차 유지 + 7번째로 추가, 기존 확정사항 누락 없음</td>
+                            <td><strong>Pass</strong> ✅</td>
                         </tr>
                         <tr>
-                            <td><strong>4. 자가 진단 피드백</strong></td>
-                            <td>마지막 자가 검증 시 누락을 인지하고 모든 필수 항목의 연결 고리를 논리적으로 체크하는가?</td>
-                            <td><span class="badge-score badge-score-5">Pass (우수)</span></td>
+                            <td>금지 사항 준수</td>
+                            <td>"추측성 표현 금지, 전문용어 과다 금지" → 12턴 전체에서 위반 없음</td>
+                            <td><strong>Pass</strong> ✅</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+            <p><strong>종합 판정: Pass</strong> ✅ (4개 기준 모두 충족)</p>
 
-            <h3>3.4 문제 지점 및 개선 요약</h3>
+            <h3>3.4 문제 지점과 개선 요약</h3>
+            <h4>문제 지점 1: 초안에서 전문 용어 중심 표현</h4>
             <ul>
-                <li><strong>초안 대화 문제:</strong> 턴 2~3 단계에서 AI가 영어 기반 전문 용어를 사전식으로 지나치게 딱딱하게 나열하여 비개발자의 학습 진입장벽을 유발했습니다.</li>
-                <li><strong>형식 흔들림:</strong> 턴 6에서 학습 목표를 추가했으나, 대화가 길어짐에 따라 학습 목표의 포맷팅(이모지, 서술어 규칙)이 미세하게 변화되는 모습이 있었습니다.</li>
-                <li><strong>조치 사항:</strong> 용어 치환 테이블을 상단에 고정 출력하도록 `SYSTEM_PROMPT`에 강제 구조 규칙을 명문화했으며, 각 챕터 서두에 `🎯 학습 목표` 블록 출력을 고정 템플릿으로 구조화하여 양식 유출을 차단했습니다.</li>
+                <li><strong>발생 턴</strong>: 턴 2 (초기 응답)</li>
+                <li><strong>원인</strong>: 시스템 프롬프트에 "쉬운 표현 병기" 규칙이 명시되지 않았음</li>
+                <li><strong>개선</strong>: 용어 병기 규칙을 시스템 프롬프트에 추가 (v2 프롬프트)</li>
+                <li><strong>결과</strong>: 턴 6부터 용어 변환표 + 병기가 일관 적용됨</li>
+            </ul>
+            <h4>문제 지점 2: 중간 수정 요청 누적 시 형식 흔들림 가능성</h4>
+            <ul>
+                <li><strong>발생 턴</strong>: 턴 7~8 (구조 변경)</li>
+                <li><strong>원인</strong>: 출력 형식 고정 규칙이 프롬프트에 부족했음</li>
+                <li><strong>개선</strong>: 최종 출력 스키마(제목 → 목차 → 설명 → 학습 목표)를 시스템 프롬프트에 고정</li>
+                <li><strong>결과</strong>: 턴 8 이후에도 형식 일관성이 유지됨</li>
+            </ul>
+            <h4>문제 지점 3: 턴 2에서 확인 질문 없이 바로 응답</h4>
+            <ul>
+                <li><strong>발생 턴</strong>: 턴 2</li>
+                <li><strong>원인</strong>: 사용자가 충분한 정보를 제공했으므로 AI가 확인 질문을 건너뛰었음</li>
+                <li><strong>판단</strong>: 이 경우 정보가 충분했으므로 적절한 행동이었음. 다만, 모호한 입력 시에는 확인 질문을 하도록 Few-shot 예시 3(모호한 입력 케이스)을 설계 문서에 반영함</li>
             </ul>
 
-            <h3>🎨 보너스 과제: 가이드북 멀티모달 시각 자료</h3>
-            <p>초보자용 가이드북의 시각적 완성도를 높이기 위해, AI를 활용해 제작한 파스텔톤의 고품질 한글 일러스트 이미지 3장입니다. 이미지 파일은 프로젝트 내의 상대 경로를 통해 안전하게 연결되어 있습니다.</p>
+            <h3>3.5 보너스 과제: 멀티모달 확장 (업무 결과의 시각화)</h3>
+            <p>본 과업의 최종 생성물인 **"GitHub 입문자를 위한 첫 리포지토리 작성 가이드"**의 완성도를 높이고 왕초보 비개발자 독자의 친근한 학습을 유도하기 위해, 이미지 생성 AI를 활용하여 가이드북의 **표지, 목차, 본문(개념 다이어그램)** 시각 자료를 제작하였습니다.</p>
             
             <div class="image-grid">
                 <div class="image-card">
-                    <img src="03_etc/github_guide_cover.png" alt="가이드북 메인 북커버">
+                    <img src="03_etc/github_guide_cover.png" alt="GitHub 가이드 북커버">
                     <div class="image-info">
-                        <h4>1. 메인 북커버 (Cover)</h4>
-                        <p>따뜻한 파스텔 색감의 서재 배경에 한글 타이틀("깃허브 입문 가이드")을 새겨 입문자의 흥미를 유발하도록 설계되었습니다.</p>
+                        <h4>1. 메인 북커버 (Cover Design)</h4>
+                        <p><strong>디자인 컨셉</strong>: 표지에 명확한 한글 타이틀인 **'깃허브 입문 가이드'**를 포함하여 비개발자 독자의 진입장벽을 낮췄습니다. 폴더에서 아이디어가 마법처럼 뿜어져 나오는 비주얼과 친근한 캐릭터를 매칭하여 어렵게 느껴지는 GitHub의 시작을 시각적으로 완충하도록 유도했습니다.</p>
                     </div>
                 </div>
                 <div class="image-card">
-                    <img src="03_etc/github_guide_toc.png" alt="가이드북 목차">
+                    <img src="03_etc/github_guide_toc.png" alt="GitHub 가이드 목차">
                     <div class="image-info">
-                        <h4>2. 목차 페이지 (TOC)</h4>
-                        <p>책의 구조를 한눈에 볼 수 있는 깔끔한 리스트와 한글 "목차" 표기가 담긴 내지 디자인 카드입니다.</p>
+                        <h4>2. 가이드북 목차 (Table of Contents)</h4>
+                        <p><strong>디자인 컨셉</strong>: 헤더 영역에 직관적인 한글 **'목차'** 타이틀을 배치하고 미니멀한 레이아웃에 챕터별 아이콘을 제공하여 독자가 학습 흐름을 한눈에 파악할 수 있도록 도왔으며, 가이드북 전체의 일관성 유지를 위해 동일한 컬러 톤을 적용했습니다.</p>
                     </div>
                 </div>
                 <div class="image-card">
-                    <img src="03_etc/github_guide_content.png" alt="가이드북 본문">
+                    <img src="03_etc/github_guide_content.png" alt="GitHub 가이드 본문">
                     <div class="image-info">
-                        <h4>3. 본문 개념도 (Commit & Push)</h4>
-                        <p>컴퓨터에서 깃허브 구름 저장소로 파일이 이동하는 흐름을 직관적으로 보여주는 한글 도식화("커밋", "푸시") 이미지입니다.</p>
+                        <h4>3. 본문 개념 시각화 (Commit & Push)</h4>
+                        <p><strong>디자인 컨셉</strong>: 로컬 컴퓨터의 폴더 상태를 저장하는 **'커밋'** 과정과 이를 클라우드 원격 저장소로 내보내는 **'푸시'** 흐름을 직관적인 한글 라벨링, 방향 화살표 및 친근한 캐릭터 그래픽으로 나타내어 동작 방식을 직관적으로 이해할 수 있게 하였습니다.</p>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Part Answers -->
+        <div id="answers" class="section-card">
+            <h2 class="section-title"><i class="fa-solid fa-graduation-cap"></i> 과제 목표에 대한 답변</h2>
+            <p>이 과제를 성공적으로 마친 후, 본 보고서를 통해 스스로 명확히 설명할 수 있게 된 핵심 개념들은 다음과 같습니다.</p>
+            
+            <h3>1. LLM의 확률적 생성과 환각(Hallucination)</h3>
+            <p>LLM은 다음에 올 단어를 확률적으로 예측해 문장을 생성합니다. 이 과정에서 학습 데이터의 패턴을 바탕으로 그럴듯한 내용을 구성하기 때문에, 검증 근거가 부족하거나 질문이 모호할 때 사실과 다른 내용(환각)이 발생할 수 있습니다.</p>
+            <ul>
+                <li>실제 테스트에서 오늘 날짜/시간을 물어봤을 때 Gemini만 정확히 답변했고, GPT-5와 Claude는 "답변할 수 없다"고 응답하여 환각 없이 안전하게 처리함</li>
+            </ul>
+
+            <h3>2. Zero-shot / Few-shot / 단계적 추론 유도(Reasoning Prompt)</h3>
+            <ul>
+                <li><strong>Zero-shot</strong>: 예시 없이 지시만 제공 ➔ 빠르지만 결과의 양식 편차가 매우 큼.</li>
+                <li><strong>Few-shot</strong>: "좋은 입력 ➔ 좋은 출력" 예시를 함께 제공 ➔ 출력 형식과 말투가 즉시 안정화됨.</li>
+                <li><strong>단계적 추론 유도 (Reasoning)</strong>: 문제를 순차적으로 분석하도록 프롬프트에 논리 단계를 명시 ➔ 복잡한 제약조건이 얽힌 과업의 지시 이행률 및 정확도가 대폭 향상되고 필수 구성요소의 누락이 예방됨.</li>
+            </ul>
+
+            <h3>3. LLM 비교 시 평가 축과 근거로 선택</h3>
+            <p>동일한 입력 조건(프롬프트, 필수 항목, 톤)을 모든 모델에 적용한 뒤, 6개 평가 축(정확성, 한국어 자연스러움, 형식 준수, 문맥 유지, 응답 속도, 비용 효율)별 점수와 근거 문장을 기록하면 "느낌"이 아닌 재현 가능한 비교가 가능합니다.</p>
+
+            <h3>4. 페르소나와 시스템 프롬프트의 영향</h3>
+            <ul>
+                <li><strong>일관성</strong>: 페르소나를 지정하면 응답 톤과 관점이 안정되어 턴 간 일관성이 높아짐.</li>
+                <li><strong>안전성</strong>: 시스템 프롬프트에 "모르면 모른다고 말하기", "근거 제시 규칙"을 명시하면 환각 위험이 감소.</li>
+                <li><strong>형식 준수</strong>: 출력 스키마(제목→목차→설명→학습 목표)를 고정하면 재생성 시에도 동일 형식 유지.</li>
+            </ul>
+
+            <h3>5. 생성 결과 검증 및 반복 개선</h3>
+            <p>환각 검증 질문 5개를 준비하고 기대 정답/Pass·Fail 기준을 세운 뒤, 오류 발생 시 프롬프트를 수정(v1→v2)해 재실행합니다. 전후 결과를 기록하면 개선 과정을 동일하게 재현할 수 있습니다.</p>
+        </div>
+
+        <!-- Github Pages Guide -->
+        <div class="section-card">
+            <h2 class="section-title"><i class="fa-solid fa-cloud-arrow-up"></i> 💡 웹 대시보드 라이브 호스팅 안내 (GitHub Pages)</h2>
+            <p>본 과제에 포함된 통합 모델 비교 시각화 대시보드([모델_비교_시각화.html](03_etc/모델_비교_시각화.html))를 언제 어디서나 라이브 웹 브라우저로 열어보고 공유할 수 있도록 <strong>GitHub Pages 정적 호스팅 설정</strong>을 지원합니다.</p>
+            
+            <h4>1. 호스팅 활성화 방법</h4>
+            <ol>
+                <li>본 리포지토리를 사용자의 GitHub 원격 저장소에 푸시(Push)합니다.</li>
+                <li>GitHub 저장소의 `Settings` ➔ `Pages` 메뉴로 이동합니다.</li>
+                <li>**Build and deployment** 섹션의 Source를 `Deploy from a branch`로 설정하고, Branch를 `main` (또는 `master`) / `/root`로 선택한 뒤 **Save**를 클릭합니다.</li>
+                <li>약 1~2분 후 상단에 라이브 배포 주소가 활성화됩니다.
+                    <ul>
+                        <li>배포 주소 예시: `https://&lt;your-github-username&gt;.github.io/&lt;your-repo-name&gt;/`</li>
+                    </ul>
+                </li>
+            </ol>
+            
+            <h4>2. 자동 리다이렉트 지원</h4>
+            <p>리포지토리 루트에 [index.html](index.html) 리다이렉션 파일이 생성되어 있으므로, 깃허브 Pages 메인 주소로 접속 시 자동으로 `03_etc/모델_비교_시각화.html` 대시보드로 리다이렉트되어 즉시 화면을 볼 수 있습니다.</p>
         </div>
 
     </div>
